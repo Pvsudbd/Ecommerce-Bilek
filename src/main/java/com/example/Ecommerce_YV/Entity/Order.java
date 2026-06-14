@@ -1,20 +1,10 @@
 package com.example.Ecommerce_YV.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.Setter;
-
+import jakarta.persistence.*;
 import java.util.Date;
 
-@Table(name = "order")
+@Entity
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -26,16 +16,55 @@ public class Order {
     @JoinColumn(name = "id_user")
     private User user;
 
-    @Setter
-    @Column(name = "date")
-    private Date date;
+    @Column(name = "tanggal")
+    private Date tanggal;
 
-    @Setter
     @Column(name = "total_harga")
     private Double totalHarga;
 
     @Column(name = "status", length = 50)
     private String status;
 
-//  getter setter
+    // Getter dan Setter
+
+    public Integer getIdOrder() {
+        return idOrder;
+    }
+
+    public void setIdOrder(Integer idOrder) {
+        this.idOrder = idOrder;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Date getTanggal() {
+        return tanggal;
+    }
+
+    public void setTanggal(Date tanggal) {
+        this.tanggal = tanggal;
+    }
+
+    public Double getTotalHarga() {
+        return totalHarga;
+    }
+
+    public void setTotalHarga(Double totalHarga) {
+        this.totalHarga = totalHarga;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}
 

@@ -8,14 +8,16 @@ public class Dsearch {
         private String category;
         private Integer stock;
         private String imageUrl;
+        private Integer likeCount;
 
-        public ProductResponse(Integer id, String name, Integer price, String category, Integer stock, String imageUrl) {
+        public ProductResponse(Integer id, String name, Integer price, String category, Integer stock, String imageUrl, Integer likeCount) {
             this.id = id;
             this.name = name;
             this.price = price;
             this.category = category;
             this.stock = stock;
             this.imageUrl = imageUrl;
+            this.likeCount = likeCount;
         }
 
         public Integer getId() { return id; }
@@ -24,5 +26,6 @@ public class Dsearch {
         public String getCategory() { return category; }
         public Integer getStock() { return stock; }
         public String getImageUrl() { return imageUrl; }
+        public Integer getLikeCount() { return likeCount; }
     }
 }

@@ -1,5 +1,5 @@
-const JAVA_SEARCH_ENDPOINT = '/products';
-const PAGE_SIZE = 15;
+const Endpoint_Java = '/products/filter';
+const page_size = 15;
 
 let products = [];
 let currentCategory = 'all';
@@ -36,6 +36,15 @@ function normalizeText(value) {
     return String(value ?? '').trim().toLowerCase();
 }
 
+function canonicalizeCategory(value) {
+    const key = normalizeText(value)
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return key === 'recommendation' ? 'recomendation' : key;
+}
+
 function normalizeProduct(product) {
     if (!product) {
         return null;
@@ -57,8 +66,25 @@ function normalizeProduct(product) {
         price: Number(price) || 0,
         category: String(category),
         stock: Number(stock) || 0,
-        imageUrl: product.imageUrl ?? product.image_url ?? product.foto_produk ?? null
+        imageUrl: product.imageUrl ?? product.image_url ?? product.foto_produk ?? null,
+        likeCount: Number(product.likeCount ?? product.like_count ?? product.tLike ?? product.T_like ?? product.likes ?? 0) || 0
     };
+}
+
+const SPORTS_CATEGORY_KEYS = new Set([
+    'fitness',
+    'clothing footwear',
+    'clothing pants',
+    'clothing activewear',
+    'sports'
+]);
+
+function redirectToLogin() {
+    const params = new URLSearchParams();
+    params.set('notice', 'auth-required');
+    params.set('redirect', 'Mainpage.html');
+    params.set('source', 'recommendation');
+    window.location.href = `Login.html?${params.toString()}`;
 }
 
 function getProductById(id) {
@@ -84,27 +110,60 @@ function getInitials(name) {
     return `${words[0][0]}${words[1][0]}`.toUpperCase();
 }
 
+function formatLikeCount(value) {
+    const likes = Number(value) || 0;
+
+    if (likes >= 100000) {
+        return '100K';
+    }
+
+    if (likes > 10000) {
+        return '10K';
+    }
+
+    return likes.toLocaleString('en-US');
+}
+
 function updatePriceLabel() {
     if (!priceLabel || !priceRange) {
         return;
     }
 
     const value = Number(priceRange.value) || 0;
-
-    if (value >= 1000000) {
-        priceLabel.textContent = `$${(value / 1000000).toFixed(1)}M`;
-        return;
-    }
-
-    priceLabel.textContent = `$${Math.round(value / 1000)}K`;
+    priceLabel.textContent = `$${value.toLocaleString('en-US')}`;
 }
 
-async function fetchProductsFromJava(keyword = '') {
+function normalizeSortValue(sort) {
+    const value = String(sort ?? 'default').trim().toLowerCase();
+
+    if (value === 'name-desc' || value === 'price-asc' || value === 'price-desc' || value === 'name-asc') {
+        return value;
+    }
+
+    return 'name-asc';
+}
+
+function getCurrentSearchKeyword() {
+    return searchInput ? searchInput.value.trim() : '';
+}
+
+function getCurrentSortValue() {
+    return sortSelect ? sortSelect.value : 'default';
+}
+
+async function fetchProductsFromJava(keyword = '', sort = 'default') {
     currentPage = 1;
 
-    const url = keyword
-        ? `${JAVA_SEARCH_ENDPOINT}?search=${encodeURIComponent(keyword)}`
-        : JAVA_SEARCH_ENDPOINT;
+    const normalizedSort = normalizeSortValue(sort);
+    const params = new URLSearchParams();
+
+    if (keyword) {
+        params.set('search', keyword);
+    }
+
+    params.set('sort', normalizedSort);
+
+    const url = `${Endpoint_Java}?${params.toString()}`;
 
     try {
         const response = await fetch(url, {
@@ -138,6 +197,13 @@ async function fetchProductsFromJava(keyword = '') {
 }
 
 function setCategory(cat) {
+    const normalizedCategory = canonicalizeCategory(cat);
+
+    if (normalizedCategory === 'recomendation' && !isUserLoggedIn()) {
+        redirectToLogin();
+        return;
+    }
+
     currentCategory = cat;
     currentPage = 1;
 
@@ -155,13 +221,26 @@ function setCategory(cat) {
     renderProducts();
 }
 
-function matchesCategory(productCategory) {
-    if (currentCategory === 'all') {
+function matchesSportsCategory(product) {
+    const categoryKey = canonicalizeCategory(product.category);
+    const productNameKey = canonicalizeCategory(product.name);
+
+    return SPORTS_CATEGORY_KEYS.has(categoryKey) || productNameKey.includes('sport');
+}
+
+function matchesCategory(product) {
+    const normalizedCategory = canonicalizeCategory(currentCategory);
+
+    if (normalizedCategory === 'all' || normalizedCategory === 'must have') {
         return true;
     }
 
-    const source = normalizeText(productCategory).replace(/[_-]+/g, ' ');
-    const target = normalizeText(currentCategory).replace(/[_-]+/g, ' ');
+    if (normalizedCategory === 'sports') {
+        return matchesSportsCategory(product);
+    }
+
+    const source = canonicalizeCategory(product.category);
+    const target = normalizedCategory;
 
     if (!source || !target) {
         return false;
@@ -182,23 +261,29 @@ function renderProducts() {
     let filtered = [...products];
 
     const maxPrice = Number(priceRange?.value || Number.MAX_SAFE_INTEGER);
-    const sortType = sortSelect?.value || 'default';
+    const normalizedCategory = canonicalizeCategory(currentCategory);
+    const isMustHave = normalizedCategory === 'must have';
 
-    filtered = filtered.filter((product) => matchesCategory(product.category));
+    if (!isMustHave) {
+        filtered = filtered.filter((product) => matchesCategory(product));
+    }
+
     filtered = filtered.filter((product) => product.price <= maxPrice);
 
-    if (sortType === 'name-asc') {
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortType === 'name-desc') {
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (sortType === 'price-asc') {
-        filtered.sort((a, b) => a.price - b.price);
-    } else if (sortType === 'price-desc') {
-        filtered.sort((a, b) => b.price - a.price);
+    if (isMustHave) {
+        filtered.sort((a, b) => {
+            const likeDiff = (Number(b.likeCount) || 0) - (Number(a.likeCount) || 0);
+
+            if (likeDiff !== 0) {
+                return likeDiff;
+            }
+
+            return String(a.name ?? '').localeCompare(String(b.name ?? ''));
+        });
     }
 
     const totalItems = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(totalItems / page_size));
 
     if (currentPage > totalPages) {
         currentPage = totalPages;
@@ -208,8 +293,8 @@ function renderProducts() {
         currentPage = 1;
     }
 
-    const startIndex = (currentPage - 1) * PAGE_SIZE;
-    const visibleProducts = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+    const startIndex = (currentPage - 1) * page_size;
+    const visibleProducts = filtered.slice(startIndex, startIndex + page_size);
 
     grid.innerHTML = '';
 
@@ -266,7 +351,13 @@ function renderProducts() {
                     ${formatUsd(product.price)}
                 </p>
 
-                <p class="mt-1 text-xs text-gray-500">${escapeHtml(stockLabel)}</p>
+                <p class="mt-1 flex items-center justify-between gap-3 text-xs text-gray-500">
+                    <span>Stok: ${escapeHtml(stockLabel)}</span>
+                    <span class="inline-flex items-center gap-1">
+                        <span class="text-red-500">&hearts;</span>
+                        <span>Like: ${escapeHtml(formatLikeCount(product.likeCount))}</span>
+                    </span>
+                </p>
 
                 <button onclick="addToCart(${product.id})"
                     class="mt-auto pt-4 text-xs font-bold uppercase tracking-wide transition ${inCart ? 'text-brand-blue' : 'text-gray-900 hover:text-brand-blue'}">
@@ -298,8 +389,8 @@ function renderPagination(totalItems, totalPages) {
         return;
     }
 
-    const pageInfoStart = (currentPage - 1) * PAGE_SIZE + 1;
-    const pageInfoEnd = Math.min(currentPage * PAGE_SIZE, totalItems);
+    const pageInfoStart = (currentPage - 1) * page_size + 1;
+    const pageInfoEnd = Math.min(currentPage * page_size, totalItems);
     const startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, currentPage + 2);
 
@@ -562,14 +653,25 @@ function bindSearch() {
 
     searchForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        currentPage = 1;
-        fetchProductsFromJava(searchInput.value.trim());
+        fetchProductsFromJava(getCurrentSearchKeyword(), getCurrentSortValue());
+    });
+}
+
+function bindSort() {
+    if (!sortSelect) {
+        return;
+    }
+
+    sortSelect.addEventListener('change', () => {
+        fetchProductsFromJava(getCurrentSearchKeyword(), getCurrentSortValue());
     });
 }
 
 function initPage() {
+    renderMainpageUserNav();
     updatePriceLabel();
     bindSearch();
+    bindSort();
 
     if (priceRange) {
         priceRange.addEventListener('input', () => {
@@ -580,7 +682,7 @@ function initPage() {
     }
 
     updateBadges();
-    fetchProductsFromJava('');
+    fetchProductsFromJava('', getCurrentSortValue());
 }
 
 initPage();

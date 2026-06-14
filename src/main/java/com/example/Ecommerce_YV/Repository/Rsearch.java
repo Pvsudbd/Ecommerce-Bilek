@@ -17,7 +17,8 @@ public interface Rsearch extends JpaRepository<Product, Integer> {
                 p.harga,
                 p.kategori,
                 p.stok,
-                p.imageUrl
+                p.imageUrl,
+                p.tLike
             )
             FROM Product p
             WHERE (

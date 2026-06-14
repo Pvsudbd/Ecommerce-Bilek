@@ -4,9 +4,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "products")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Product {
 
     @Id
@@ -28,51 +34,6 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    public Integer getIdProduct() {
-        return idProduct;
-    }
-
-    public void setIdProduct(Integer idProduct) {
-        this.idProduct = idProduct;
-    }
-
-    public String getNamaProduct() {
-        return namaProduct;
-    }
-
-    public void setNamaProduct(String namaProduct) {
-        this.namaProduct = namaProduct;
-    }
-
-    public Integer getStok() {
-        return stok;
-    }
-
-    public void setStok(Integer stok) {
-        this.stok = stok;
-    }
-
-    public Integer getHarga() {
-        return harga;
-    }
-
-    public void setHarga(Integer harga) {
-        this.harga = harga;
-    }
-
-    public String getKategori() {
-        return kategori;
-    }
-
-    public void setKategori(String kategori) {
-        this.kategori = kategori;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+    @Column(name = "T_like")
+    private Integer tLike;
 }

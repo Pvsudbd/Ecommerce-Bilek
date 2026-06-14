@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sellora – Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="CSS/Login.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <style>
+        .btn-register {
+            background: #4338ca;
+            position: relative;
+            overflow: hidden;
+            transition: background .2s;
+        }
+        .btn-register:hover:not(:disabled) { background: #3730a3; }
+        .btn-register:disabled {
+            cursor: not-allowed;
+            opacity: .7;
+        }
+        .btn-register::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.15) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform .4s ease;
+        }
+        .btn-register:hover:not(:disabled)::after { transform: translateX(100%); }
+
+        .strength-bar {
+            height: 3px;
+            border-radius: 999px;
+            transition: width .3s ease, background .3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-stretch bg-white">
+
+<div id="registerNotice" class="fixed left-1/2 top-4 z-50 hidden w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 opacity-0 translate-y-4 transition-all duration-300 ease-out pointer-events-none" role="alert" aria-live="assertive">
+    <div class="pointer-events-auto overflow-hidden rounded-3xl border border-indigo-100 bg-white/95 p-5 shadow-[0_25px_70px_rgba(67,56,202,0.22)] backdrop-blur">
+        <div class="flex items-start gap-4">
+            <div class="relative flex h-16 w-16 shrink-0 items-center justify-center">
+                <div class="absolute inset-0 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
+                <div id="registerNoticeIcon" class="absolute inset-2 flex items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 9v4"></path>
+                        <path d="M12 17h.01"></path>
+                        <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex-1 pr-6">
+                <p id="registerNoticeBadge" class="text-[11px] font-bold uppercase tracking-[0.28em] text-indigo-500">Perhatian</p>
+                <h2 id="registerNoticeTitle" class="mt-1 text-lg font-extrabold text-gray-900">Register gagal</h2>
+                <p id="registerNoticeMessage" class="mt-2 text-sm leading-6 text-gray-500">
+                    Periksa kembali data yang kamu isi.
+                </p>
+            </div>
+
+            <button id="registerNoticeClose" type="button" class="text-gray-400 transition hover:text-gray-700" aria-label="Tutup notifikasi">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="flex flex-col justify-between w-full lg:w-1/2 px-10 md:px-16 py-10">
+
+    <a href="Mainpage.html" class="anim-1 flex items-center gap-2.5 w-fit">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M14 2L24 8V20L14 26L4 20V8L14 2Z" fill="#4338ca" opacity=".2"/>
+            <path d="M14 2L24 8V20L14 26L4 20V8L14 2Z" stroke="#4338ca" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="14" cy="14" r="4" fill="#4338ca"/>
+        </svg>
+        <span class="text-gray-900 font-semibold text-lg tracking-tight">Sellora</span>
+    </a>
+
+    <div class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
+
+        <h1 class="anim-2 text-3xl font-bold text-gray-900 mb-1.5">Create Account</h1>
+        <p class="anim-3 text-sm text-gray-500 mb-7">Daftar sebagai customer untuk mulai berbelanja di Sellora.</p>
+
+        <form id="registerForm" class="w-full" novalidate>
+
+            <div class="anim-4 mb-4">
+                <label for="nameInput" class="block text-xs font-medium text-gray-600 mb-1.5">Username</label>
+                <input
+                    id="nameInput"
+                    name="name"
+                    type="text"
+                    autocomplete="username"
+                    placeholder="Masukkan username"
+                    required
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white
+                           placeholder:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+                <p id="nameInputError" class="hidden mt-1.5 text-xs text-rose-500"></p>
+            </div>
+
+            <div class="anim-4 mb-4">
+                <label for="addressInput" class="block text-xs font-medium text-gray-600 mb-1.5">Alamat</label>
+                <textarea
+                    id="addressInput"
+                    name="address"
+                    rows="3"
+                    autocomplete="street-address"
+                    placeholder="Alamat lengkap pengiriman"
+                    required
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white resize-none
+                           placeholder:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                ></textarea>
+                <p id="addressInputError" class="hidden mt-1.5 text-xs text-rose-500"></p>
+            </div>
+
+            <div class="anim-5 mb-1.5">
+                <label for="passwordInput" class="block text-xs font-medium text-gray-600 mb-1.5">Password</label>
+                <div class="relative">
+                    <input
+                        id="passwordInput"
+                        name="password"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Min. 8 karakter"
+                        required
+                        minlength="8"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white pr-10
+                               placeholder:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    />
+                    <button
+                        type="button"
+                        onclick="togglePasswordVisibility('passwordInput', 'iconEyeOff', 'iconEyeOn')"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        aria-label="Tampilkan password"
+                    >
+                        <svg id="iconEyeOff" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                        <svg id="iconEyeOn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="hidden">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+                <p id="passwordInputError" class="hidden mt-1.5 text-xs text-rose-500"></p>
+            </div>
+
+            <div class="anim-5 mb-4">
+                <div class="flex gap-1.5 mt-2">
+                    <div id="bar1" class="strength-bar flex-1 bg-gray-100"></div>
+                    <div id="bar2" class="strength-bar flex-1 bg-gray-100"></div>
+                    <div id="bar3" class="strength-bar flex-1 bg-gray-100"></div>
+                    <div id="bar4" class="strength-bar flex-1 bg-gray-100"></div>
+                </div>
+                <p id="strengthLabel" class="text-[11px] text-gray-400 mt-1.5"></p>
+            </div>
+
+            <div class="anim-5 mb-5">
+                <label for="confirmInput" class="block text-xs font-medium text-gray-600 mb-1.5">Konfirmasi Password</label>
+                <div class="relative">
+                    <input
+                        id="confirmInput"
+                        name="confirmPassword"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Ulangi password"
+                        required
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white pr-10
+                               placeholder:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    />
+                    <button
+                        type="button"
+                        onclick="togglePasswordVisibility('confirmInput', 'iconEyeOff2', 'iconEyeOn2')"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        aria-label="Tampilkan konfirmasi password"
+                    >
+                        <svg id="iconEyeOff2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                        <svg id="iconEyeOn2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="hidden">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+                <p id="confirmInputError" class="hidden mt-1.5 text-xs text-rose-500"></p>
+            </div>
+
+            <div class="anim-6 mb-6">
+                <label class="flex items-start gap-2.5 text-sm text-gray-600 cursor-pointer select-none">
+                    <input id="termsCheckbox" type="checkbox" class="w-3.5 h-3.5 mt-0.5 accent-indigo-600 rounded shrink-0" />
+                    <span>Saya setuju dengan <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium transition">Terms of Service</a> dan <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium transition">Privacy Policy</a>.</span>
+                </label>
+            </div>
+
+            <button
+                id="registerButton"
+                type="submit"
+                class="anim-6 btn-register w-full py-3 rounded-xl text-white text-sm font-semibold shadow-md shadow-indigo-200 mb-6"
+            >
+                Create Account
+            </button>
+        </form>
+
+        <p class="anim-8 text-center text-sm text-gray-500">
+            Sudah punya akun?
+            <a href="Login.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition">Log In.</a>
+        </p>
+    </div>
+
+    <div class="anim-1 flex justify-between text-xs text-gray-400 pt-4">
+        <span>Copyright © 2025 Sellora Enterprises LTD.</span>
+        <a href="#" class="hover:text-gray-600 transition">Privacy Policy</a>
+    </div>
+</div>
+
+<div class="right-panel hidden lg:flex lg:w-1/2 relative overflow-hidden rounded-l-3xl">
+    <img
+        src="Asset/img/ImageLogin.jpg"
+        alt="Online Shopping"
+        class="right-img absolute inset-0 w-full h-full object-cover"
+    />
+
+    <div class="img-overlay absolute inset-0"></div>
+
+    <div class="relative z-10 flex flex-col justify-end p-14 pb-16">
+        <span class="inline-flex items-center gap-2 text-indigo-200 text-xs font-semibold uppercase tracking-widest mb-5">
+            <span class="w-6 h-px bg-indigo-300"></span>
+            Sellora Platform
+        </span>
+        <h2 class="text-white font-bold text-4xl leading-tight mb-4" style="font-family:'Instrument Serif',serif;">
+            Join thousands of<br/>teams already on Sellora.
+        </h2>
+        <p class="text-indigo-200 text-sm leading-relaxed max-w-xs">
+            Buat akun customer dan mulai jelajahi produk favoritmu dari satu halaman utama.
+        </p>
+
+        <div class="flex gap-4 mt-10">
+            <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+                <p class="text-white text-xl font-bold">12K+</p>
+                <p class="text-indigo-200 text-xs mt-0.5">Active Users</p>
+            </div>
+            <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+                <p class="text-white text-xl font-bold">98%</p>
+                <p class="text-indigo-200 text-xs mt-0.5">Satisfaction</p>
+            </div>
+            <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+                <p class="text-white text-xl font-bold">Free</p>
+                <p class="text-indigo-200 text-xs mt-0.5">To Start</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="JS/Auth.js"></script>
+<script src="JS/Register.js"></script>
+</body>
+</html>

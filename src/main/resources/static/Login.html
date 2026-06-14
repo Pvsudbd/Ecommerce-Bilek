@@ -4,177 +4,179 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sellora – Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>\
-    <link rel="stylesheet" href="CSS/login.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="CSS/Login.css" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <style>
+        .btn-login:disabled {
+            cursor: not-allowed;
+            opacity: .7;
+        }
+    </style>
 </head>
 <body class="min-h-screen flex items-stretch bg-white">
 
-<!-- ───────────────── LEFT – Form ───────────────── -->
+<div id="loginNotice" class="fixed left-1/2 top-4 z-50 hidden w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 opacity-0 translate-y-4 transition-all duration-300 ease-out pointer-events-none" role="alert" aria-live="assertive">
+    <div class="pointer-events-auto overflow-hidden rounded-3xl border border-indigo-100 bg-white/95 p-5 shadow-[0_25px_70px_rgba(67,56,202,0.22)] backdrop-blur">
+        <div class="flex items-start gap-4">
+            <div class="relative flex h-16 w-16 shrink-0 items-center justify-center">
+                <div class="absolute inset-0 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
+                <div id="loginNoticeIcon" class="absolute inset-2 flex items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 9v4"></path>
+                        <path d="M12 17h.01"></path>
+                        <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex-1 pr-6">
+                <p id="loginNoticeBadge" class="text-[11px] font-bold uppercase tracking-[0.28em] text-indigo-500">Perhatian</p>
+                <h2 id="loginNoticeTitle" class="mt-1 text-lg font-extrabold text-gray-900">Login gagal</h2>
+                <p id="loginNoticeMessage" class="mt-2 text-sm leading-6 text-gray-500">
+                    Periksa kembali username dan password kamu.
+                </p>
+            </div>
+
+            <button id="loginNoticeClose" type="button" class="text-gray-400 transition hover:text-gray-700" aria-label="Tutup notifikasi">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="flex flex-col justify-between w-full lg:w-1/2 px-10 md:px-16 py-10">
 
-    <!-- Logo -->
-    <div class="anim-1 flex items-center gap-2.5">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <a href="Mainpage.html" class="anim-1 flex items-center gap-2.5 w-fit">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M14 2L24 8V20L14 26L4 20V8L14 2Z" fill="#4338ca" opacity=".2"/>
             <path d="M14 2L24 8V20L14 26L4 20V8L14 2Z" stroke="#4338ca" stroke-width="2" stroke-linejoin="round"/>
             <circle cx="14" cy="14" r="4" fill="#4338ca"/>
         </svg>
         <span class="text-gray-900 font-semibold text-lg tracking-tight">Sellora</span>
-    </div>
+    </a>
 
-    <!-- Form body -->
     <div class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
 
         <h1 class="anim-2 text-3xl font-bold text-gray-900 mb-1.5">Welcome Back</h1>
-        <p class="anim-3 text-sm text-gray-500 mb-8">Enter your email and password to access your account.</p>
+        <p class="anim-3 text-sm text-gray-500 mb-8">Masuk dengan username dan password untuk melanjutkan.</p>
 
-        <!-- Email -->
-        <div class="anim-4 mb-5">
-            <label class="block text-xs font-medium text-gray-600 mb-1.5">Email</label>
-            <input
-                    type="email"
-                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white
-                 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-            />
-        </div>
+        <form id="loginForm" class="w-full" novalidate>
 
-        <!-- Password -->
-        <div class="anim-5 mb-5">
-            <label class="block text-xs font-medium text-gray-600 mb-1.5">Password</label>
-            <div class="relative">
+            <div class="anim-4 mb-5">
+                <label for="nameInput" class="block text-xs font-medium text-gray-600 mb-1.5">Username</label>
                 <input
-                        id="passwordInput"
-                        type="password"
-                        class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white pr-10
-                   focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    id="nameInput"
+                    name="name"
+                    type="text"
+                    autocomplete="username"
+                    placeholder="Masukkan username"
+                    required
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white
+                           placeholder:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                 />
-                <button id="togglePassword" type="button"
-                        onclick="
-              const input = document.getElementById('passwordInput');
-              const isHidden = input.type === 'password';
-              input.type = isHidden ? 'text' : 'password';
-              document.getElementById('iconEyeOff').classList.toggle('hidden', !isHidden);
-              document.getElementById('iconEyeOn').classList.toggle('hidden', isHidden);
-            "
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
-                    <!-- Eye-off (default: password hidden) -->
-                    <svg id="iconEyeOff" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                        <line x1="1" y1="1" x2="23" y2="23"/>
-                    </svg>
-                    <!-- Eye-on (shown when password visible) -->
-                    <svg id="iconEyeOn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="hidden">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                </button>
+                <p id="nameInputError" class="hidden mt-1.5 text-xs text-rose-500"></p>
             </div>
-        </div>
 
-        <!-- Remember & Forgot -->
-        <div class="anim-5 flex items-center justify-between mb-7">
-            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-                <input type="checkbox" class="w-3.5 h-3.5 accent-indigo-600 rounded" />
-                Remember Me
-            </label>
-            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">Forgot Your Password?</a>
-        </div>
+            <div class="anim-5 mb-5">
+                <label for="passwordInput" class="block text-xs font-medium text-gray-600 mb-1.5">Password</label>
+                <div class="relative">
+                    <input
+                        id="passwordInput"
+                        name="password"
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Masukkan password"
+                        required
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 bg-white pr-10
+                               placeholder:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    />
+                    <button
+                        type="button"
+                        onclick="togglePasswordVisibility('passwordInput', 'iconEyeOff', 'iconEyeOn')"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        aria-label="Tampilkan password"
+                    >
+                        <svg id="iconEyeOff" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                        <svg id="iconEyeOn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="hidden">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+                <p id="passwordInputError" class="hidden mt-1.5 text-xs text-rose-500"></p>
+            </div>
 
-        <!-- Login button -->
-        <button class="anim-6 btn-login w-full py-3 rounded-xl text-white text-sm font-semibold shadow-md shadow-indigo-200 mb-6">
-            Log In
-        </button>
+            <div class="anim-5 flex items-center justify-between mb-7">
+                <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                    <input id="rememberCheckbox" type="checkbox" class="w-3.5 h-3.5 accent-indigo-600 rounded" />
+                    Remember Me
+                </label>
+                <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">Forgot Your Password?</a>
+            </div>
 
-        <!-- Divider -->
-        <div class="anim-6 flex items-center gap-3 mb-6">
-            <div class="flex-1 h-px bg-gray-100"></div>
-            <span class="text-xs text-gray-400">Or Login With</span>
-            <div class="flex-1 h-px bg-gray-100"></div>
-        </div>
-
-        <!-- Social -->
-        <div class="anim-7 grid grid-cols-2 gap-3 mb-6">
-            <button class="btn-social flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700">
-                <!-- Google icon -->
-                <svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Google
+            <button id="loginButton" type="submit" class="anim-6 btn-login w-full py-3 rounded-xl text-white text-sm font-semibold shadow-md shadow-indigo-200 mb-6">
+                Log In
             </button>
-            <button class="btn-social flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700">
-                <!-- Apple icon -->
-                <svg width="15" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
-                Apple
-            </button>
-        </div>
+        </form>
 
-        <!-- Register link -->
         <p class="anim-7 text-center text-sm text-gray-500">
             Don't Have An Account?
-            <a href="#" class="text-indigo-600 font-semibold hover:text-indigo-800 transition">Register Now.</a>
+            <a id="register-link" href="register.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition">Register Now.</a>
         </p>
     </div>
 
-    <!-- Footer -->
     <div class="anim-1 flex justify-between text-xs text-gray-400 pt-4">
         <span>Copyright © 2025 Sellora Enterprises LTD.</span>
         <a href="#" class="hover:text-gray-600 transition">Privacy Policy</a>
     </div>
 </div>
 
-<!-- ───────────────── RIGHT – Image Panel ───────────────── -->
 <div class="right-panel hidden lg:flex lg:w-1/2 relative overflow-hidden rounded-l-3xl">
-
-    <!-- Background image (uploaded photo) -->
     <img
-            src="Asset/img/ImageLogin.jpg"
-            alt="Online Shopping"
-            class="right-img absolute inset-0 w-full h-full object-cover"
+        src="Asset/img/ImageLogin.jpg"
+        alt="Online Shopping"
+        class="right-img absolute inset-0 w-full h-full object-cover"
     />
 
-    <!-- Indigo overlay for brand cohesion + readability -->
     <div class="img-overlay absolute inset-0"></div>
 
-    <!-- Text content on top -->
     <div class="relative z-10 flex flex-col justify-end p-14 pb-16">
-      <span class="inline-flex items-center gap-2 text-indigo-200 text-xs font-semibold uppercase tracking-widest mb-5">
-        <span class="w-6 h-px bg-indigo-300"></span>
-        Sellora Platform
-      </span>
+        <span class="inline-flex items-center gap-2 text-indigo-200 text-xs font-semibold uppercase tracking-widest mb-5">
+            <span class="w-6 h-px bg-indigo-300"></span>
+            Sellora Platform
+        </span>
         <h2 class="text-white font-bold text-4xl leading-tight mb-4" style="font-family:'Instrument Serif',serif;">
             Effortlessly manage<br/>your team and operations.
         </h2>
         <p class="text-indigo-200 text-sm leading-relaxed max-w-xs">
-            Log in to access your CRM dashboard and manage your team in one unified workspace.
+            Login sebagai customer untuk belanja, atau sebagai admin untuk masuk ke dashboard.
         </p>
 
-        <!-- Stat pills -->
         <div class="flex gap-4 mt-10">
             <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
-                <p class="text-white text-xl font-bold">$189K</p>
-                <p class="text-indigo-200 text-xs mt-0.5">Total Sales</p>
+                <p class="text-white text-xl font-bold">Customer</p>
+                <p class="text-indigo-200 text-xs mt-0.5">Mainpage</p>
             </div>
             <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
-                <p class="text-white text-xl font-bold">6,248</p>
-                <p class="text-indigo-200 text-xs mt-0.5">Units Sold</p>
-            </div>
-            <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
-                <p class="text-white text-xl font-bold">$25.6K</p>
-                <p class="text-indigo-200 text-xs mt-0.5">Total Profit</p>
+                <p class="text-white text-xl font-bold">Admin</p>
+                <p class="text-indigo-200 text-xs mt-0.5">Dashboard</p>
             </div>
         </div>
     </div>
 </div>
 
+<script src="JS/Auth.js"></script>
+<script src="JS/Login.js"></script>
 </body>
 </html>

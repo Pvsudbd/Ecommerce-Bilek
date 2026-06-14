@@ -3,43 +3,42 @@ package com.example.Ecommerce_YV.Entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "order_item")
-public class OrderItems {
+@Table(name = "cart_item")
+public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_order_item")
-    private Integer idOrderItem;
+    @Column(name = "id_cart_item")
+    private Integer idCartItem;
 
     @ManyToOne
-    @JoinColumn(name = "id_order", nullable = false)
-    private Order order;
+    @JoinColumn(name = "id_cart")
+    private Cart cart;
 
     @ManyToOne
-    @JoinColumn(name = "id_product", nullable = false)
+    @JoinColumn(name = "id_product")
     private Product product;
 
-    @Column(name = "jumlah_barang", nullable = false)
+    @Column(name = "jumlah_barang")
     private Integer jumlahBarang;
 
-    @Column(name = "total_harga", nullable = false)
+    @Column(name = "total_harga")
     private Double totalHarga;
 
-    // Getter Setter
-    public Integer getIdOrderItem() {
-        return idOrderItem;
+    public Integer getIdCartItem() {
+        return idCartItem;
     }
 
-    public void setIdOrderItem(Integer idOrderItem) {
-        this.idOrderItem = idOrderItem;
+    public void setIdCartItem(Integer idCartItem) {
+        this.idCartItem = idCartItem;
     }
 
-    public Order getOrder() {
-        return order;
+    public Cart getCart() {
+        return cart;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public Product getProduct() {
@@ -66,3 +65,4 @@ public class OrderItems {
         this.totalHarga = totalHarga;
     }
 }
+
