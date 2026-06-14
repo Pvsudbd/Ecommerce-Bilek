@@ -2,7 +2,7 @@ package com.example.Ecommerce_YV;
 
 import com.example.Ecommerce_YV.Dto.Auth.DRegisterRequest;
 import com.example.Ecommerce_YV.Dto.Auth.DRegisterResponse;
-import com.example.Ecommerce_YV.Service.SRegister;
+import com.example.Ecommerce_YV.Service.Auth.SRegister;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

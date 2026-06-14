@@ -1,6 +1,6 @@
-package com.example.Ecommerce_YV.Service;
+package com.example.Ecommerce_YV.Service.Mainpage;
 
-import com.example.Ecommerce_YV.Dto.Dsearch;
+import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
 import com.example.Ecommerce_YV.Repository.Rfilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

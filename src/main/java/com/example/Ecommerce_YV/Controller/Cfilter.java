@@ -1,7 +1,8 @@
 package com.example.Ecommerce_YV.Controller;
 
-import com.example.Ecommerce_YV.Dto.Dsearch;
-import com.example.Ecommerce_YV.Service.Sfilter;
+import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
+import com.example.Ecommerce_YV.Service.Mainpage.Sfilter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

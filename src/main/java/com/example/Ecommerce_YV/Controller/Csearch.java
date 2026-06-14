@@ -1,7 +1,8 @@
 package com.example.Ecommerce_YV.Controller;
 
-import com.example.Ecommerce_YV.Dto.Dsearch;
-import com.example.Ecommerce_YV.Service.Ssearch;
+import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
+import com.example.Ecommerce_YV.Service.Mainpage.Ssearch;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

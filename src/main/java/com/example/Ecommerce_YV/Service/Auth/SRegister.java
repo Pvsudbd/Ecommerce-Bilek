@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Service;
+package com.example.Ecommerce_YV.Service.Auth;
 
 import com.example.Ecommerce_YV.Dto.Auth.DRegisterRequest;
 import com.example.Ecommerce_YV.Dto.Auth.DRegisterResponse;

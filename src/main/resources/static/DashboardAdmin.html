@@ -56,8 +56,37 @@
             </div>
         </div>
     </div>
-</main>
 
+    <!-- FITUR SEARCH & PRODUK -->
+    <div class="mt-10">
+        <!-- Search Bar -->
+        <div class="flex gap-2 mb-8">
+            <input type="text" id="searchInput" placeholder="Cari nama barang atau kategori..." 
+                   class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                   onkeydown="if(event.key === 'Enter') fetchDashboard()">
+            <button onclick="fetchDashboard()" class="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-indigo-700 shadow-sm hover:shadow-indigo-200">
+                CARI
+            </button>
+        </div>
+
+        <!-- Search Results (Hidden by default) -->
+        <div id="searchResultSection" class="hidden mb-10">
+            <h2 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2">Hasil Pencarian</h2>
+            <div id="searchResultGrid" class="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <!-- Data hasil pencarian masuk sini -->
+            </div>
+        </div>
+
+        <!-- Random Products -->
+        <div>
+            <h2 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2">Produk Pilihan (Acak)</h2>
+            <div id="randomProductsGrid" class="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <!-- Data produk acak masuk sini -->
+            </div>
+        </div>
+    </div>
+
+</main>
 <script src="JS/Auth.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -65,7 +94,143 @@
             return;
         }
         renderAdminHeader();
+        fetchDashboard(); // Load data saat halaman pertama dibuka
     });
+
+    // Fungsi untuk hit API /api/dashboard
+    async function fetchDashboard() {
+        const searchInput = document.getElementById('searchInput').value;
+        let url = '/api/dashboard';
+        
+        if (searchInput && searchInput.trim() !== '') {
+            url += `?search=${encodeURIComponent(searchInput.trim())}`;
+        }
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Gagal mengambil data");
+            const data = await response.json();
+            
+            // Render 6 produk acak
+            const randomGrid = document.getElementById('randomProductsGrid');
+            if (data.randomProducts && data.randomProducts.length > 0) {
+                randomGrid.innerHTML = data.randomProducts.map(createProductCard).join('');
+            } else {
+                randomGrid.innerHTML = '<p class="col-span-full text-slate-500 italic">Belum ada barang di database.</p>';
+            }
+            
+            // Render hasil pencarian
+            const searchSection = document.getElementById('searchResultSection');
+            const searchGrid = document.getElementById('searchResultGrid');
+            
+            if (data.searchResults && data.searchResults.length > 0) {
+                searchSection.classList.remove('hidden');
+                searchGrid.innerHTML = data.searchResults.map(createProductCard).join('');
+            } else if (searchInput && searchInput.trim() !== '') {
+                searchSection.classList.remove('hidden');
+                searchGrid.innerHTML = '<p class="col-span-full text-slate-500 italic">Barang tidak ditemukan.</p>';
+            } else {
+                searchSection.classList.add('hidden');
+                searchGrid.innerHTML = '';
+            }
+        } catch (error) {
+            console.error('Error fetching dashboard:', error);
+            alert("Terjadi kesalahan saat memuat data.");
+        }
+    }
+
+    // Fungsi untuk menghapus produk
+    async function hapusProduk(id) {
+        if (!confirm('Apakah kamu yakin ingin menghapus barang ini?')) return;
+        
+        try {
+            const response = await fetch(`/api/dashboard/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                alert('Barang berhasil dihapus!');
+                fetchDashboard(); // Refresh halaman otomatis
+            } else {
+                const err = await response.text();
+                alert(`Gagal menghapus: ${err}`);
+            }
+        } catch (error) {
+            console.error('Error delete:', error);
+            alert('Terjadi kesalahan jaringan.');
+        }
+    }
+
+    // Fungsi untuk menambah stok
+    async function tambahStok(id) {
+        const input = prompt('Masukkan JUMLAH STOK TAMBAHAN (contoh: 5 untuk menambah 5 stok, atau -2 untuk mengurangi):');
+        if (input === null || input.trim() === '') return;
+        
+        const jumlah = parseInt(input, 10);
+        if (isNaN(jumlah)) {
+            alert('Input harus berupa angka!');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/dashboard/${id}/stock`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jumlah: jumlah })
+            });
+
+            if (response.ok) {
+                alert('Stok berhasil diupdate!');
+                fetchDashboard(); // Refresh otomatis
+            } else {
+                const err = await response.text();
+                alert(`Gagal update stok: ${err}`);
+            }
+        } catch (error) {
+            console.error('Error patch stock:', error);
+            alert('Terjadi kesalahan jaringan.');
+        }
+    }
+
+    // Fungsi untuk membuat HTML Card Produk
+    function createProductCard(product) {
+        // Harga diformat ke Rupiah
+        const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price);
+        // Fallback jika tidak ada gambar
+        const imgUrl = product.imageUrl || 'https://via.placeholder.com/300x300?text=No+Image';
+
+        return `
+            <div class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg hover:border-indigo-300 relative">
+                <div class="relative h-48 w-full overflow-hidden bg-slate-100">
+                    <img src="${imgUrl}" alt="${product.name}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+                    <div class="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm backdrop-blur">
+                        ❤️ ${product.likeCount || 0}
+                    </div>
+                </div>
+                <div class="flex flex-1 flex-col p-5">
+                    <span class="mb-1 text-[10px] font-bold uppercase tracking-wider text-indigo-500">${product.category}</span>
+                    <h3 class="mb-1 line-clamp-2 text-base font-bold text-slate-900">${product.name}</h3>
+                    <div class="mt-auto pt-3 flex items-end justify-between border-t border-slate-100 mb-3">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500">Harga</p>
+                            <p class="text-sm font-bold text-slate-900">${priceFormatted}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-medium text-slate-500">Stok</p>
+                            <p class="text-sm font-bold ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}">${product.stock > 0 ? product.stock : 'Habis'}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="tambahStok(${product.id})" class="rounded-lg bg-green-500 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-green-600">
+                            + Stok
+                        </button>
+                        <button onclick="hapusProduk(${product.id})" class="rounded-lg bg-red-500 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-red-600">
+                            Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 </script>
 </body>
 </html>

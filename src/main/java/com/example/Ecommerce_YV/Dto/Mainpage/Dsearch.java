@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Dto;
+package com.example.Ecommerce_YV.Dto.Mainpage;
 
 public class Dsearch {
     public static class ProductResponse {

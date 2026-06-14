@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Service;
+package com.example.Ecommerce_YV.Service.Auth;
 
 import com.example.Ecommerce_YV.Dto.Auth.DLoginRequest;
 import com.example.Ecommerce_YV.Dto.Auth.DLoginResponse;

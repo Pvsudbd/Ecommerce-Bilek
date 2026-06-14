@@ -1,6 +1,6 @@
 package com.example.Ecommerce_YV.Repository;
 
-import com.example.Ecommerce_YV.Dto.Dsearch;
+import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
 import com.example.Ecommerce_YV.Entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
