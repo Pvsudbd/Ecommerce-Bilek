@@ -2,7 +2,7 @@ package com.example.Ecommerce_YV.Controller;
 
 import com.example.Ecommerce_YV.Dto.Auth.DLoginRequest;
 import com.example.Ecommerce_YV.Dto.Auth.DLoginResponse;
-import com.example.Ecommerce_YV.Service.SAuth;
+import com.example.Ecommerce_YV.Service.SLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CLogin {
 
     @Autowired
-    private SAuth authService;
+    private SLogin authService;
 
     @PostMapping
     public DLoginResponse login(@RequestBody DLoginRequest request) {
