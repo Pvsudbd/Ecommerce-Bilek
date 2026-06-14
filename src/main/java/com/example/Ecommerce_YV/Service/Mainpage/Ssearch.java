@@ -1,7 +1,7 @@
 package com.example.Ecommerce_YV.Service.Mainpage;
 
 import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
-import com.example.Ecommerce_YV.Repository.Rsearch;
+import com.example.Ecommerce_YV.Repository.Mainpage.Rsearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class Ssearch {
     private Rsearch repository;
 
     public List<Dsearch.ProductResponse> getAllProducts(String search) {
-        List<Dsearch.ProductResponse> rawList = repository.getAllProducts(search == null ? "" : search.trim());
+        List<Dsearch.ProductResponse> rawList = repository.getAllProducts(search == null ? "" : search.trim().toLowerCase());
         
         return rawList.stream()
                 .collect(java.util.stream.Collectors.groupingBy(

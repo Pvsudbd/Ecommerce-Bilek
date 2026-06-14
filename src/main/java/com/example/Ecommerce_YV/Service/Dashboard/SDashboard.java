@@ -30,12 +30,15 @@ public class SDashboard {
                         p.getTLike()
                 )).collect(Collectors.toList());
 
-        List<Dsearch.ProductResponse> randomProducts = deduplicateProducts(randomProductsRaw);
+        List<Dsearch.ProductResponse> randomProducts = deduplicateProducts(randomProductsRaw)
+                .stream()
+                .limit(6)
+                .collect(Collectors.toList());
 
         // 2. Ambil hasil pencarian (jika parameter search ada)
         List<Dsearch.ProductResponse> searchResults = null;
         if (search != null && !search.trim().isEmpty()) {
-            List<Dsearch.ProductResponse> searchResultsRaw = repository.searchProducts(search.trim());
+            List<Dsearch.ProductResponse> searchResultsRaw = repository.searchProducts(search.trim().toLowerCase());
             searchResults = deduplicateProducts(searchResultsRaw);
         }
 

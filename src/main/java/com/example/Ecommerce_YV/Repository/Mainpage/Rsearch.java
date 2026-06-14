@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Repository;
+package com.example.Ecommerce_YV.Repository.Mainpage;
 
 import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
 import com.example.Ecommerce_YV.Entity.Product;
@@ -11,7 +11,7 @@ import java.util.List;
 public interface Rsearch extends JpaRepository<Product, Integer> {
 
     @Query("""
-            SELECT new com.example.Ecommerce_YV.Dto.Dsearch$ProductResponse(
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
                 p.idProduct,
                 p.namaProduct,
                 p.harga,

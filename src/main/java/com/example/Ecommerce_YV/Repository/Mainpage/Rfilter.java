@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Repository;
+package com.example.Ecommerce_YV.Repository.Mainpage;
 
 import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
 import com.example.Ecommerce_YV.Entity.Product;
@@ -11,7 +11,7 @@ import java.util.List;
 public interface Rfilter extends JpaRepository<Product, Integer> {
 
     @Query("""
-            SELECT new com.example.Ecommerce_YV.Dto.Dsearch$ProductResponse(
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
                 p.idProduct,
                 p.namaProduct,
                 p.harga,
@@ -32,7 +32,7 @@ public interface Rfilter extends JpaRepository<Product, Integer> {
     List<Dsearch.ProductResponse> findAllBySearchOrderByNameAsc(@Param("search") String search);
 
     @Query("""
-            SELECT new com.example.Ecommerce_YV.Dto.Dsearch$ProductResponse(
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
                 p.idProduct,
                 p.namaProduct,
                 p.harga,
@@ -53,7 +53,7 @@ public interface Rfilter extends JpaRepository<Product, Integer> {
     List<Dsearch.ProductResponse> findAllBySearchOrderByNameDesc(@Param("search") String search);
 
     @Query("""
-            SELECT new com.example.Ecommerce_YV.Dto.Dsearch$ProductResponse(
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
                 p.idProduct,
                 p.namaProduct,
                 p.harga,
@@ -74,7 +74,7 @@ public interface Rfilter extends JpaRepository<Product, Integer> {
     List<Dsearch.ProductResponse> findAllBySearchOrderByPriceAsc(@Param("search") String search);
 
     @Query("""
-            SELECT new com.example.Ecommerce_YV.Dto.Dsearch$ProductResponse(
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
                 p.idProduct,
                 p.namaProduct,
                 p.harga,
@@ -93,4 +93,25 @@ public interface Rfilter extends JpaRepository<Product, Integer> {
             ORDER BY p.harga DESC
             """)
     List<Dsearch.ProductResponse> findAllBySearchOrderByPriceDesc(@Param("search") String search);
+
+    @Query("""
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
+                p.idProduct,
+                p.namaProduct,
+                p.harga,
+                p.kategori,
+                p.stok,
+                p.imageUrl,
+                p.tLike
+            )
+            FROM Product p
+            WHERE (
+                :search IS NULL
+                OR :search = ''
+                OR LOWER(p.namaProduct) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(p.kategori) LIKE LOWER(CONCAT('%', :search, '%'))
+            )
+            ORDER BY RAND()
+            """)
+    List<Dsearch.ProductResponse> findAllBySearchOrderByRandom(@Param("search") String search);
 }

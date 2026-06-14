@@ -13,12 +13,12 @@ import java.util.List;
 public interface RDashboard extends JpaRepository<Product, Integer> {
 
     // Mengambil 6 barang random dari database (Native MySQL)
-    @Query(value = "SELECT * FROM products ORDER BY RAND() LIMIT 6", nativeQuery = true)
+    @Query(value = "SELECT * FROM products ORDER BY RAND() LIMIT 30", nativeQuery = true)
     List<Product> getRandomProducts();
 
     // Mencari barang berdasarkan nama atau kategori, mirip dengan Rsearch
     @Query("""
-            SELECT new com.example.Ecommerce_YV.Dto.Dsearch$ProductResponse(
+            SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
                 p.idProduct,
                 p.namaProduct,
                 p.harga,
@@ -32,7 +32,7 @@ public interface RDashboard extends JpaRepository<Product, Integer> {
                 LOWER(p.namaProduct) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(p.kategori) LIKE LOWER(CONCAT('%', :search, '%'))
             )
-            ORDER BY p.namaProduct ASC
+            ORDER BY RAND()
             """)
     List<Dsearch.ProductResponse> searchProducts(@Param("search") String search);
 }

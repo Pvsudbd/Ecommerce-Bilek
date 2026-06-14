@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Controller;
+package com.example.Ecommerce_YV.Controller.Dashboard;
 
 import com.example.Ecommerce_YV.Dto.Dashboard.DDashboard;
 import com.example.Ecommerce_YV.Service.Dashboard.SDashboard;

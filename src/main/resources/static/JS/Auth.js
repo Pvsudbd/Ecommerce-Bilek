@@ -145,14 +145,21 @@ function renderMainpageUserNav() {
 
     const session = getAuthSession();
 
+    const promoBannerGuest = document.getElementById('promoBannerGuest');
+    const promoBannerMember = document.getElementById('promoBannerMember');
+
     if (!session) {
         loginLink.classList.remove('hidden');
         userMenu.classList.add('hidden');
+        if (promoBannerGuest) promoBannerGuest.classList.remove('hidden');
+        if (promoBannerMember) promoBannerMember.classList.add('hidden');
         return;
     }
 
     loginLink.classList.add('hidden');
     userMenu.classList.remove('hidden');
+    if (promoBannerGuest) promoBannerGuest.classList.add('hidden');
+    if (promoBannerMember) promoBannerMember.classList.remove('hidden');
 
     if (userAvatar) {
         userAvatar.src = session.avatarUrl;

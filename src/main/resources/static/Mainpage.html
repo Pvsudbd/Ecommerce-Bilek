@@ -15,6 +15,15 @@
               colors: {
                 'brand-blue': '#4338CA',
                 'brand-blue-hover': '#0044CC',
+              },
+              animation: {
+                'marquee': 'marquee 15s linear infinite',
+              },
+              keyframes: {
+                marquee: {
+                  '0%': { transform: 'translateX(100%)' },
+                  '100%': { transform: 'translateX(-100%)' },
+                }
               }
             }
           }
@@ -25,8 +34,13 @@
 </head>
 <body class="bg-white min-h-screen text-gray-900">
 
-<div class="bg-brand-blue text-white text-[10px] sm:text-xs text-center py-2.5 font-bold uppercase tracking-widest">
-    Gratis Ongkir Untuk Member Baru &nbsp;&rsaquo;&nbsp; Daftar Sekarang
+<div id="promoBanner" class="bg-brand-blue text-white text-[10px] sm:text-xs py-2.5 font-bold uppercase tracking-widest overflow-hidden relative w-full flex items-center justify-center min-h-[36px]">
+    <div id="promoBannerGuest" class="w-full text-center">
+        Gratis Ongkir Untuk Member Baru &nbsp;&rsaquo;&nbsp; <a href="Register.html" class="underline hover:text-gray-200">Daftar Sekarang</a>
+    </div>
+    <div id="promoBannerMember" class="w-full hidden whitespace-nowrap animate-marquee absolute">
+        Selora, jagonya belanja murah. Cihuyyyyyyyy
+    </div>
 </div>
 
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -186,7 +200,7 @@
     </div>
 </div>
 
-<script src="JS/Auth.js"></script>
+<script src="JS/Auth.js?v=20260614-2"></script>
 <script src="JS/Mainpage.js?v=20260605-5"></script>
 
 </body>

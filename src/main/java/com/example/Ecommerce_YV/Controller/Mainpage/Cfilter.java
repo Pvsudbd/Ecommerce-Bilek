@@ -1,4 +1,4 @@
-package com.example.Ecommerce_YV.Controller;
+package com.example.Ecommerce_YV.Controller.Mainpage;
 
 import com.example.Ecommerce_YV.Dto.Mainpage.Dsearch;
 import com.example.Ecommerce_YV.Service.Mainpage.Sfilter;
