@@ -80,10 +80,122 @@
         </div>
     </div>
 
+<!-- Modal Tambah Produk -->
+<div id="addProductModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+    <div id="addProductModalBackdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeAddProductModal()"></div>
+    <div id="addProductModalContent" class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform scale-95 opacity-0 transition-all duration-300 overflow-y-auto max-h-[90vh]">
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Tambah Produk Baru</h3>
+        <p class="text-sm text-slate-500 mb-6">Masukkan detail produk dan pilih gambar untuk diunggah ke Supabase.</p>
+        
+        <form id="addProductForm" onsubmit="submitNewProduct(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Nama Produk</label>
+                <input type="text" id="addName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Harga ($)</label>
+                    <input type="number" id="addPrice" required min="0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Stok Awal</label>
+                    <input type="number" id="addStock" required min="0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Kategori</label>
+                <select id="addCategory" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-700">
+                    <option value="" disabled selected>Pilih Kategori</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Audio">Audio</option>
+                    <option value="Automotive">Automotive</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Books">Books</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Clothing - Accessories">Clothing - Accessories</option>
+                    <option value="Clothing - Activewear">Clothing - Activewear</option>
+                    <option value="Clothing - Bottoms">Clothing - Bottoms</option>
+                    <option value="Clothing - Dresses">Clothing - Dresses</option>
+                    <option value="Clothing - Footwear">Clothing - Footwear</option>
+                    <option value="Clothing - Outerwear">Clothing - Outerwear</option>
+                    <option value="Clothing - Pants">Clothing - Pants</option>
+                    <option value="Clothing - Skirts">Clothing - Skirts</option>
+                    <option value="Clothing - Tops">Clothing - Tops</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Fitness">Fitness</option>
+                    <option value="Food - Bakery">Food - Bakery</option>
+                    <option value="Food - Baking">Food - Baking</option>
+                    <option value="Food - Baking Goods">Food - Baking Goods</option>
+                    <option value="Food - Beverages">Food - Beverages</option>
+                    <option value="Food - Breakfast">Food - Breakfast</option>
+                    <option value="Food - Canned Goods">Food - Canned Goods</option>
+                    <option value="Food - Cheese">Food - Cheese</option>
+                    <option value="Food - Condiments">Food - Condiments</option>
+                    <option value="Food - Cooking Oil">Food - Cooking Oil</option>
+                    <option value="Food - Dairy">Food - Dairy</option>
+                    <option value="Food - Dairy Alternatives">Food - Dairy Alternatives</option>
+                    <option value="Food - Deli">Food - Deli</option>
+                    <option value="Food - Dips">Food - Dips</option>
+                    <option value="Food - Dressings">Food - Dressings</option>
+                    <option value="Food - Freezer">Food - Freezer</option>
+                    <option value="Food - Fresh Produce">Food - Fresh Produce</option>
+                    <option value="Food - Frozen Food">Food - Frozen Food</option>
+                    <option value="Food - Frozen Foods">Food - Frozen Foods</option>
+                    <option value="Food - Frozen Vegetables">Food - Frozen Vegetables</option>
+                    <option value="Food - Fruits">Food - Fruits</option>
+                    <option value="Food - Grains">Food - Grains</option>
+                    <option value="Food - Meat">Food - Meat</option>
+                    <option value="Food - Nuts">Food - Nuts</option>
+                    <option value="Food - Pasta">Food - Pasta</option>
+                    <option value="Food - Prepared Foods">Food - Prepared Foods</option>
+                    <option value="Food - Prepared Meals">Food - Prepared Meals</option>
+                    <option value="Food - Produce">Food - Produce</option>
+                    <option value="Food - Salads">Food - Salads</option>
+                    <option value="Food - Sauces">Food - Sauces</option>
+                    <option value="Food - Seafood">Food - Seafood</option>
+                    <option value="Food - Seasonings">Food - Seasonings</option>
+                    <option value="Food - Snacks">Food - Snacks</option>
+                    <option value="Food - Vegetables">Food - Vegetables</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Garden">Garden</option>
+                    <option value="Health">Health</option>
+                    <option value="Home">Home</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Office">Office</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Foto Produk</label>
+                <input type="file" id="addImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border border-slate-200 rounded-xl" />
+                <p class="text-[10px] text-slate-400 mt-1">* Kosongkan jika belum ada gambar (akan pakai placeholder).</p>
+            </div>
+            
+            <div class="flex items-center gap-3 mt-6 pt-2">
+                <button type="button" onclick="closeAddProductModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition">Batal</button>
+                <button type="submit" id="btnSubmitAddProduct" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-md shadow-indigo-200 transition flex justify-center items-center gap-2">
+                    Simpan Produk
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
     <!-- FITUR SEARCH & PRODUK -->
     <div class="mt-10">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <h2 class="text-xl font-bold text-slate-900">Daftar Barang</h2>
+            <button onclick="openAddProductModal()" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-700 shadow-md flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Tambah Produk
+            </button>
+        </div>
+        
         <!-- Search Bar -->
-        <div class="flex gap-2 mb-8">
+        <div class="relative max-w-md w-full mb-6">
             <input type="text" id="searchInput" placeholder="Cari nama barang atau kategori..." 
                    class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                    onkeydown="if(event.key === 'Enter') fetchDashboard()">
@@ -288,6 +400,93 @@
         } catch (error) {
             console.error('Error patch stock:', error);
             showToast('Terjadi kesalahan jaringan.', true);
+        }
+    }
+
+    function openAddProductModal() {
+        const modal = document.getElementById('addProductModal');
+        const backdrop = document.getElementById('addProductModalBackdrop');
+        const content = document.getElementById('addProductModalContent');
+        
+        document.getElementById('addProductForm').reset();
+        
+        modal.classList.remove('hidden');
+        void modal.offsetWidth; // trigger reflow
+        
+        backdrop.classList.remove('opacity-0');
+        content.classList.remove('opacity-0', 'scale-95');
+        document.getElementById('addName').focus();
+    }
+
+    function closeAddProductModal() {
+        const modal = document.getElementById('addProductModal');
+        const backdrop = document.getElementById('addProductModalBackdrop');
+        const content = document.getElementById('addProductModalContent');
+        
+        backdrop.classList.add('opacity-0');
+        content.classList.add('opacity-0', 'scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    async function submitNewProduct(event) {
+        event.preventDefault();
+        
+        const nama = document.getElementById('addName').value;
+        const harga = document.getElementById('addPrice').value;
+        const stok = document.getElementById('addStock').value;
+        const kategori = document.getElementById('addCategory').value;
+        const fileInput = document.getElementById('addImage');
+        
+        if (!nama || !harga || !stok || !kategori) {
+            showToast('Harap lengkapi semua field teks!', true);
+            return;
+        }
+
+        if (fileInput.files.length > 0) {
+            const fileSize = fileInput.files[0].size / 1024 / 1024; // in MB
+            if (fileSize > 2) {
+                showToast('Ukuran gambar tidak boleh lebih dari 2MB!', true);
+                return;
+            }
+        }
+
+        const formData = new FormData();
+        formData.append('nama', nama);
+        formData.append('harga', harga);
+        formData.append('stok', stok);
+        formData.append('kategori', kategori);
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        const btnSubmit = document.getElementById('btnSubmitAddProduct');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = 'Menyimpan...';
+
+        try {
+            const response = await fetch('/api/dashboard/product', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                showToast('Produk berhasil ditambahkan!');
+                fetchDashboard();
+                closeAddProductModal();
+            } else {
+                const err = await response.text();
+                showToast(`Gagal: ${err}`, true);
+            }
+        } catch (error) {
+            console.error('Error add product:', error);
+            showToast('Terjadi kesalahan jaringan saat upload.', true);
+        } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
         }
     }
 

@@ -139,11 +139,11 @@ function updatePriceLabel() {
 function normalizeSortValue(sort) {
     const value = String(sort ?? 'default').trim().toLowerCase();
 
-    if (value === 'name-desc' || value === 'price-asc' || value === 'price-desc' || value === 'name-asc') {
+    if (value === 'name-desc' || value === 'price-asc' || value === 'price-desc' || value === 'name-asc' || value === 'default') {
         return value;
     }
 
-    return 'name-asc';
+    return 'default';
 }
 
 function getCurrentSearchKeyword() {

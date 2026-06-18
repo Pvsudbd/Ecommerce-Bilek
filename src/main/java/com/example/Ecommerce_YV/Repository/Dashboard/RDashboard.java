@@ -35,4 +35,7 @@ public interface RDashboard extends JpaRepository<Product, Integer> {
             ORDER BY RAND()
             """)
     List<Dsearch.ProductResponse> searchProducts(@Param("search") String search);
+
+    @Query("SELECT MAX(p.idProduct) FROM Product p")
+    Integer getMaxId();
 }
