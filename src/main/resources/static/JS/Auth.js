@@ -2,6 +2,7 @@ const AUTH_STORAGE_KEYS = [
     'isLoggedIn',
     'loggedIn',
     'currentUser',
+    'userId',
     'role',
     'userRole',
     'currentUserRole',
@@ -48,6 +49,7 @@ function saveAuthSession(userData, options = {}) {
         isLoggedIn: 'true',
         loggedIn: 'true',
         currentUser: userData.name || '',
+        userId: String(userData.userId || ''),
         role: normalizeRole(userData.role),
         userRole: normalizeRole(userData.role),
         currentUserRole: normalizeRole(userData.role),
@@ -81,12 +83,14 @@ function getAuthSession() {
     }
 
     const name = getStoredValue('currentUser') || '';
+    const userId = getStoredValue('userId') || '';
     const role = normalizeRole(getStoredValue('role') || getStoredValue('userRole') || getStoredValue('currentUserRole'));
     const address = getStoredValue('userAddress') || '';
     const avatarUrl = getStoredValue('userAvatar') || buildAvatarUrl(name);
 
     return {
         name,
+        userId,
         role,
         address,
         avatarUrl

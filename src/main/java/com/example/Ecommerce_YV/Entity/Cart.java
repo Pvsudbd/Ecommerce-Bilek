@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 
 @Entity
-@Table(name = "cart")
+@Table(name = "carts")
 public class Cart {
 
     @Id
@@ -16,10 +16,10 @@ public class Cart {
     @JoinColumn(name = "id_user")
     private User user;
 
-    @Column(name = "jumlah_barang")
+    @Transient
     private Integer jumlahBarang;
 
-    @Column(name = "total_harga")
+    @Transient
     private Double totalHarga;
 
     public Integer getIdCart() {

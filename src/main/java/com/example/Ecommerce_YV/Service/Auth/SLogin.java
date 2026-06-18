@@ -41,6 +41,7 @@ public class SLogin {
 
         response.setSuccess(true);
         response.setMessage("Login berhasil");
+        response.setIdUser(user.getIdUser());
         response.setName(user.getName());
         response.setRole(user.getRole().name());
 

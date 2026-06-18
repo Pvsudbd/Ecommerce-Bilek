@@ -1,26 +1,24 @@
 package com.example.Ecommerce_YV.Dto.Mainpage;
 
-public class DAddKeranjang {
+import java.util.List;
+
+public class DCartResponse {
 
     private Boolean success;
 
     private String message;
 
-    private String customerName;
-
     private Integer customerId;
 
-    private Integer productId;
+    private String customerName;
 
-    private Integer quantity = 1;
-
-    private String productName;
+    private Integer cartId;
 
     private Integer totalItems;
 
     private Double totalPrice;
 
-    private Integer remainingStock;
+    private List<DCartItemResponse> items;
 
     public Boolean getSuccess() {
         return success;
@@ -38,14 +36,6 @@ public class DAddKeranjang {
         this.message = message;
     }
 
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
     public Integer getCustomerId() {
         return customerId;
     }
@@ -54,28 +44,20 @@ public class DAddKeranjang {
         this.customerId = customerId;
     }
 
-    public Integer getProductId() {
-        return productId;
+    public String getCustomerName() {
+        return customerName;
     }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public Integer getCartId() {
+        return cartId;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setCartId(Integer cartId) {
+        this.cartId = cartId;
     }
 
     public Integer getTotalItems() {
@@ -94,11 +76,11 @@ public class DAddKeranjang {
         this.totalPrice = totalPrice;
     }
 
-    public Integer getRemainingStock() {
-        return remainingStock;
+    public List<DCartItemResponse> getItems() {
+        return items;
     }
 
-    public void setRemainingStock(Integer remainingStock) {
-        this.remainingStock = remainingStock;
+    public void setItems(List<DCartItemResponse> items) {
+        this.items = items;
     }
 }

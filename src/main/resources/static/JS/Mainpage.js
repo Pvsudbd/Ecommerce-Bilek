@@ -1,10 +1,13 @@
 const Endpoint_Java = '/products/filter';
+const Cart_Endpoint = '/api/cart/add';
+const Cart_State_Endpoint = '/api/cart';
 const page_size = 15;
 
 let products = [];
 let currentCategory = 'all';
 let currentPage = 1;
 let cart = {};
+let cartItems = [];
 let wishlist = {};
 let activeDrawer = 'cart';
 let loadError = false;
@@ -149,6 +152,119 @@ function getCurrentSearchKeyword() {
 
 function getCurrentSortValue() {
     return sortSelect ? sortSelect.value : 'default';
+}
+
+function getLoggedInCustomerName() {
+    const session = getAuthSession();
+    return session ? session.name : '';
+}
+
+function getLoggedInCustomerId() {
+    const session = getAuthSession();
+    if (!session || !session.userId) {
+        return null;
+    }
+
+    const value = Number(session.userId);
+    return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function setCartState(items) {
+    cart = {};
+
+    cartItems = Array.isArray(items) ? items : [];
+
+    cartItems.forEach((item) => {
+        const productId = Number(item?.productId);
+        const quantity = Number(item?.quantity) || 0;
+
+        if (Number.isFinite(productId) && productId > 0 && quantity > 0) {
+            cart[productId] = quantity;
+        }
+    });
+
+    updateBadges();
+    renderProducts();
+}
+
+async function loadCartFromServer() {
+    const session = getAuthSession();
+
+    if (!session) {
+        setCartState([]);
+        return;
+    }
+
+    const customerId = getLoggedInCustomerId();
+    const params = new URLSearchParams();
+
+    if (customerId) {
+        params.set('customerId', String(customerId));
+    } else if (session.name) {
+        params.set('customerName', session.name);
+    }
+
+    if (!params.toString()) {
+        setCartState([]);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${Cart_State_Endpoint}?${params.toString()}`, {
+            headers: {
+                Accept: 'application/json'
+            }
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json')
+            ? await response.json()
+            : { success: false };
+
+        if (!response.ok || !data.success) {
+            setCartState([]);
+            return;
+        }
+
+        setCartState(data.items || []);
+    } catch (error) {
+        console.warn('Gagal memuat keranjang dari server:', error);
+        setCartState([]);
+    }
+}
+
+async function saveCartQuantityToServer(id, quantity) {
+    const session = getAuthSession();
+
+    if (!session) {
+        redirectToLogin();
+        return null;
+    }
+
+    const response = await fetch(`${Cart_State_Endpoint}/item`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify({
+            customerId: getLoggedInCustomerId(),
+            customerName: getLoggedInCustomerName(),
+            productId: Number(id),
+            quantity: Number(quantity) || 0
+        })
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json')
+        ? await response.json()
+        : { success: false, message: await response.text() };
+
+    if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Gagal memperbarui keranjang.');
+    }
+
+    return data;
 }
 
 async function fetchProductsFromJava(keyword = '', sort = 'default') {
@@ -467,30 +583,89 @@ function pageButton(page, isActive = false) {
     `;
 }
 
-function addToCart(id) {
-    const key = String(id);
-
-    cart[key] = (cart[key] || 0) + 1;
-
-    updateBadges();
-    renderProducts();
-}
-
-function updateCartQty(id, delta) {
-    const key = String(id);
-
-    if (!cart[key]) {
+function showCartNotice(message) {
+    if (!message) {
         return;
     }
 
-    cart[key] += delta;
+    window.alert(message);
+}
 
-    if (cart[key] <= 0) {
-        delete cart[key];
+async function addToCart(id, quantity = 1) {
+    const session = getAuthSession();
+
+    if (!session) {
+        redirectToLogin();
+        return;
     }
 
-    updateBadges();
-    renderProducts();
+    const product = getProductById(id);
+
+    if (!product) {
+        showCartNotice('Produk tidak ditemukan.');
+        return;
+    }
+
+    const key = String(id);
+    const requestedQuantity = Math.max(1, Number(quantity) || 1);
+
+    try {
+        const response = await fetch(Cart_Endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            },
+            body: JSON.stringify({
+                customerId: getLoggedInCustomerId(),
+                customerName: getLoggedInCustomerName(),
+                productId: Number(id),
+                quantity: requestedQuantity
+            })
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json')
+            ? await response.json()
+            : { success: false, message: await response.text() };
+
+        if (!response.ok || !data.success) {
+            showCartNotice(data.message || `Gagal menambahkan barang ke keranjang (${response.status}).`);
+            return;
+        }
+
+        await loadCartFromServer();
+    } catch (error) {
+        showCartNotice('Tidak dapat terhubung ke server. Coba lagi nanti.');
+    }
+}
+
+async function updateCartQty(id, delta) {
+    const key = String(id);
+    const currentQuantity = Number(cart[key]) || 0;
+
+    if (delta > 0) {
+        addToCart(id, delta);
+        return;
+    }
+
+    if (!currentQuantity) {
+        return;
+    }
+
+    const nextQuantity = currentQuantity + delta;
+
+    try {
+        if (nextQuantity <= 0) {
+            await saveCartQuantityToServer(id, 0);
+        } else {
+            await saveCartQuantityToServer(id, nextQuantity);
+        }
+
+        await loadCartFromServer();
+    } catch (error) {
+        showCartNotice(error.message || 'Gagal memperbarui keranjang.');
+    }
 }
 
 function toggleWishlist(id) {
@@ -574,12 +749,21 @@ function renderDrawer() {
         ? Object.keys(wishlist)
             .map((id) => getProductById(id))
             .filter(Boolean)
-        : Object.entries(cart)
-            .map(([id, qty]) => {
-                const product = getProductById(id);
-                return product ? { product, qty } : null;
-            })
-            .filter(Boolean);
+        : cartItems.map((item) => {
+            const product = item?.productId ? getProductById(item.productId) : null;
+            return {
+                cartItemId: item?.cartItemId,
+                productId: item?.productId,
+                productName: item?.productName || product?.name || 'Produk',
+                quantity: Number(item?.quantity) || 0,
+                totalPrice: Number(item?.totalPrice) || 0,
+                availableStock: Number(item?.availableStock) || product?.stock || 0,
+                category: product?.category || item?.category || 'Produk',
+                imageUrl: product?.imageUrl || item?.imageUrl || null,
+                price: product?.price || 0,
+                product
+            };
+        }).filter((item) => Number(item.quantity) > 0);
 
     if (items.length === 0) {
         drawerItems.innerHTML = `
@@ -595,27 +779,37 @@ function renderDrawer() {
 
     drawerItems.innerHTML = items.map((item) => {
         const product = isWishlist ? item : item.product;
-        const qty = isWishlist ? 1 : item.qty;
-        const stockInfo = product.stock > 0 ? `${product.stock} stok` : 'Stok habis';
+        const qty = isWishlist ? 1 : item.quantity;
+        const stockCount = isWishlist ? (product?.stock || 0) : item.availableStock;
+        const stockInfo = stockCount > 0 ? `${stockCount} stok` : 'Stok habis';
+        const productPrice = isWishlist ? (product?.price || 0) : (item.price || 0);
+        const productName = isWishlist ? (product?.name || 'Produk') : item.productName;
+        const productCategory = isWishlist ? (product?.category || 'Produk') : item.category;
 
         return `
             <div class="flex gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-gray-100 text-sm font-black text-gray-900">
-                    ${escapeHtml(getInitials(product.name))}
+                    ${escapeHtml(getInitials(productName))}
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="flex items-start justify-between gap-2">
                         <div class="min-w-0">
-                            <p class="truncate text-sm font-semibold text-gray-900">${escapeHtml(product.name)}</p>
-                            <p class="mt-0.5 text-xs text-gray-500">${escapeHtml(product.category || 'Produk')}</p>
+                            <p class="truncate text-sm font-semibold text-gray-900">${escapeHtml(productName)}</p>
+                            <p class="mt-0.5 text-xs text-gray-500">${escapeHtml(productCategory || 'Produk')}</p>
                         </div>
-                        <button onclick="toggleWishlist(${product.id})" class="text-xs font-bold uppercase tracking-wide ${wishlist[product.id] ? 'text-brand-blue' : 'text-gray-400'}">
-                            ${wishlist[product.id] ? 'Saved' : 'Save'}
-                        </button>
+                        ${
+                            isWishlist
+                                ? `<button onclick="toggleWishlist(${product.id})" class="text-xs font-bold uppercase tracking-wide ${wishlist[product.id] ? 'text-brand-blue' : 'text-gray-400'}">
+                                        ${wishlist[product.id] ? 'Saved' : 'Save'}
+                                   </button>`
+                                : `<button onclick="updateCartQty(${item.productId}, -${qty})" class="text-xs font-bold uppercase tracking-wide text-rose-500">
+                                        Hapus
+                                   </button>`
+                        }
                     </div>
                     <div class="mt-2 flex items-center justify-between gap-3">
                         <div>
-                            <p class="text-sm font-bold text-brand-blue">${formatUsd(product.price)}</p>
+                            <p class="text-sm font-bold text-brand-blue">${formatUsd(productPrice)}</p>
                             <p class="text-xs text-gray-500">${escapeHtml(stockInfo)}</p>
                         </div>
                         ${
@@ -623,9 +817,9 @@ function renderDrawer() {
                                 ? `<button onclick="addToCart(${product.id})" class="rounded-full bg-brand-blue px-3 py-1.5 text-xs font-bold uppercase text-white transition hover:bg-brand-blue-hover">Tambah</button>`
                                 : `
                                     <div class="flex items-center gap-2">
-                                        <button onclick="updateCartQty(${product.id}, -1)" class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-sm font-bold text-gray-700 transition hover:border-brand-blue hover:text-brand-blue">-</button>
+                                        <button onclick="updateCartQty(${item.productId}, -1)" class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-sm font-bold text-gray-700 transition hover:border-brand-blue hover:text-brand-blue">-</button>
                                         <span class="min-w-6 text-center text-sm font-bold text-gray-900">${qty}</span>
-                                        <button onclick="addToCart(${product.id})" class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-sm font-bold text-gray-700 transition hover:border-brand-blue hover:text-brand-blue">+</button>
+                                        <button onclick="addToCart(${item.productId})" class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-sm font-bold text-gray-700 transition hover:border-brand-blue hover:text-brand-blue">+</button>
                                     </div>
                                 `
                         }
@@ -641,7 +835,7 @@ function renderDrawer() {
         return;
     }
 
-    const total = items.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+    const total = items.reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
     drawerFooter.classList.remove('hidden');
     cartTotal.textContent = formatUsd(total);
 }
@@ -682,6 +876,7 @@ function initPage() {
     }
 
     updateBadges();
+    loadCartFromServer();
     fetchProductsFromJava('', getCurrentSortValue());
 }
 

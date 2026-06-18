@@ -13,5 +13,7 @@ public interface RCart extends JpaRepository<Cart, Integer> {
             User user
     );
 
+    Optional<Cart> findByUser_IdUser(Integer idUser);
+
 }
 

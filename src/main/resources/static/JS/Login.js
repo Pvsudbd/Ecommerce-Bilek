@@ -126,6 +126,7 @@ async function handleLoginSubmit(event) {
 
         saveAuthSession({
             name: data.name || name,
+            userId: data.idUser || '',
             role: data.role,
             address: data.address || '',
             avatarUrl: buildAvatarUrl(data.name || name)

@@ -12,6 +12,8 @@ public class DLoginResponse {
 
     private String address;
 
+    private Integer idUser;
+
     public Boolean getSuccess() {
         return success;
     }
@@ -50,5 +52,13 @@ public class DLoginResponse {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Integer getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(Integer idUser) {
+        this.idUser = idUser;
     }
 }
