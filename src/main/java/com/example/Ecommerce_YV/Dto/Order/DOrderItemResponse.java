@@ -1,8 +1,8 @@
-package com.example.Ecommerce_YV.Dto.Mainpage;
+package com.example.Ecommerce_YV.Dto.Order;
 
-public class DCartItemResponse {
+public class DOrderItemResponse {
 
-    private Integer cartItemId;
+    private Integer orderItemId;
 
     private Integer productId;
 
@@ -10,18 +10,14 @@ public class DCartItemResponse {
 
     private Integer quantity;
 
-    private Double unitPrice;
-
     private Double totalPrice;
 
-    private Integer availableStock;
-
-    public Integer getCartItemId() {
-        return cartItemId;
+    public Integer getOrderItemId() {
+        return orderItemId;
     }
 
-    public void setCartItemId(Integer cartItemId) {
-        this.cartItemId = cartItemId;
+    public void setOrderItemId(Integer orderItemId) {
+        this.orderItemId = orderItemId;
     }
 
     public Integer getProductId() {
@@ -48,27 +44,11 @@ public class DCartItemResponse {
         this.quantity = quantity;
     }
 
-    public Double getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(Double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
     public Double getTotalPrice() {
         return totalPrice;
     }
 
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public Integer getAvailableStock() {
-        return availableStock;
-    }
-
-    public void setAvailableStock(Integer availableStock) {
-        this.availableStock = availableStock;
     }
 }

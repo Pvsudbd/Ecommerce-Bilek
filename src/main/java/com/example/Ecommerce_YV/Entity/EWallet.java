@@ -3,9 +3,9 @@ package com.example.Ecommerce_YV.Entity;
 public class EWallet implements Payment {
 
     @Override
-    public void bayar(Double nominal) {
-        System.out.println(
-                "Pembayaran E-Wallet sebesar Rp " + nominal
-        );
+    public String bayar(Double nominal) {
+        String message = "Pembayaran E-Wallet sebesar Rp " + nominal;
+        System.out.println(message);
+        return message;
     }
 }
