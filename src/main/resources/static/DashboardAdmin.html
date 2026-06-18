@@ -262,7 +262,24 @@
 
             if (response.ok) {
                 showToast('Stok berhasil diupdate!');
-                fetchDashboard(); // Refresh otomatis
+                
+                // Update text di layar tanpa me-refresh halaman agar produk tidak teracak/hilang
+                const stockEl = document.getElementById(`stock-display-${currentStockProductId}`);
+                if (stockEl) {
+                    let currentStockText = stockEl.innerText;
+                    let oldStock = currentStockText === 'Habis' ? 0 : parseInt(currentStockText, 10);
+                    let newStock = oldStock + jumlah;
+                    
+                    stockEl.innerText = newStock > 0 ? newStock : 'Habis';
+                    if (newStock > 0) {
+                        stockEl.classList.remove('text-red-500');
+                        stockEl.classList.add('text-green-600');
+                    } else {
+                        stockEl.classList.remove('text-green-600');
+                        stockEl.classList.add('text-red-500');
+                    }
+                }
+
                 closeStockModal();
             } else {
                 const err = await response.text();
@@ -276,8 +293,8 @@
 
     // Fungsi untuk membuat HTML Card Produk
     function createProductCard(product) {
-        // Harga diformat ke Rupiah
-        const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price);
+        // Harga diformat ke Dollar
+        const priceFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(product.price);
         // Fallback jika tidak ada gambar
         const imgUrl = product.imageUrl || 'https://via.placeholder.com/300x300?text=No+Image';
 
@@ -299,7 +316,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-xs font-medium text-slate-500">Stok</p>
-                            <p class="text-sm font-bold ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}">${product.stock > 0 ? product.stock : 'Habis'}</p>
+                            <p id="stock-display-${product.id}" class="text-sm font-bold ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}">${product.stock > 0 ? product.stock : 'Habis'}</p>
                         </div>
                     </div>
                     
