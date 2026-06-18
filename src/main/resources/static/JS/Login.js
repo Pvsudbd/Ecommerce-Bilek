@@ -1,5 +1,6 @@
 const LOGIN_ENDPOINT = '/api/login';
 
+// Munculin kotak notifikasi pop-up (bisa ijo kalau sukses, merah kalau gagal)
 function showLoginNotice(type, title, message) {
     const notice = document.getElementById('loginNotice');
     const titleEl = document.getElementById('loginNoticeTitle');
@@ -31,6 +32,7 @@ function showLoginNotice(type, title, message) {
     });
 }
 
+// Ngumpetin kotak notifikasinya biar layar nggak penuh
 function hideLoginNotice() {
     const notice = document.getElementById('loginNotice');
     if (!notice) {
@@ -41,6 +43,7 @@ function hideLoginNotice() {
     window.setTimeout(() => notice.classList.add('hidden'), 220);
 }
 
+// Ngasih efek merah-merah kalau inputannya salah atau kosong
 function setLoginFieldError(input, message) {
     const errorEl = document.getElementById(`${input.id}Error`);
     if (!errorEl) {
@@ -61,6 +64,7 @@ function setLoginFieldError(input, message) {
     errorEl.classList.add('hidden');
 }
 
+// Ngecek formnya udah beneran diisi atau belum sebelum dikirim
 function validateLoginForm(name, password) {
     const nameInput = document.getElementById('nameInput');
     const passwordInput = document.getElementById('passwordInput');
@@ -82,11 +86,13 @@ function validateLoginForm(name, password) {
     return valid;
 }
 
+// Nangkep link tujuan kalau user tadinya lagi mau buka halaman khusus tapi disuruh login dulu
 function getLoginRedirectParam() {
     const params = new URLSearchParams(window.location.search);
     return params.get('redirect') || '';
 }
 
+// Proses inti nih pas tombol login dipencet, nyambungin ke server
 async function handleLoginSubmit(event) {
     event.preventDefault();
 
@@ -156,6 +162,7 @@ async function handleLoginSubmit(event) {
     }
 }
 
+// Buat ngintip tulisan password (ubah lambang mata dicoret jadi kebuka)
 function togglePasswordVisibility(inputId, eyeOffId, eyeOnId) {
     const input = document.getElementById(inputId);
     const eyeOff = document.getElementById(eyeOffId);
@@ -171,6 +178,7 @@ function togglePasswordVisibility(inputId, eyeOffId, eyeOnId) {
     eyeOn.classList.toggle('hidden', isHidden);
 }
 
+// Nampilin peringatan tegas kalau ada user nyasar ke halaman yang wajib login
 function initAuthRequiredNotice() {
     const params = new URLSearchParams(window.location.search);
 

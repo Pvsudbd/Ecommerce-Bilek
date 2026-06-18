@@ -22,6 +22,7 @@ public class Sfilter {
             case "price-asc" -> repository.findAllBySearchOrderByPriceAsc(normalizedSearch);
             case "price-desc" -> repository.findAllBySearchOrderByPriceDesc(normalizedSearch);
             case "name-asc" -> repository.findAllBySearchOrderByNameAsc(normalizedSearch);
+            case "recommendation" -> repository.findAllBySearchOrderByRecommendation(normalizedSearch);
             case "default" -> repository.findAllBySearchOrderByRandom(normalizedSearch);
             default -> repository.findAllBySearchOrderByRandom(normalizedSearch);
         };

@@ -13,6 +13,7 @@ const summaryTotalEl = document.getElementById('summaryTotal');
 const checkoutButtonEl = document.getElementById('checkoutButton');
 const checkoutMessageEl = document.getElementById('checkoutMessage');
 
+// Ngerubah angka biasa jadi format uang Dollar 
 function formatUsd(angka) {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -21,6 +22,7 @@ function formatUsd(angka) {
     }).format(Number(angka) || 0);
 }
 
+// ini biar cuman nerima teks biasa kayak contoh "ada" dan bukan xss
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -30,11 +32,13 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+// Bikin label tulisan bank biar rapi dibacanya
 function getPaymentMethodLabel(method) {
     const normalized = String(method || '').trim().toUpperCase();
     return normalized === 'TRANSFER' ? 'Transfer Bank' : 'EWallet';
 }
 
+// Munculin pesan peringatan merah atau abu-abu di bawah keranjang
 function showMessage(message, isError = false) {
     if (!checkoutMessageEl) {
         return;
@@ -46,6 +50,7 @@ function showMessage(message, isError = false) {
         : 'mt-3 text-sm font-medium text-gray-500';
 }
 
+// Ngecek user udah login belum, kalau belum ditendang ke halaman login
 function requireSession() {
     const session = getAuthSession();
 
@@ -57,6 +62,7 @@ function requireSession() {
     return session;
 }
 
+// Ngambil data id sama nama user yang lagi aktif
 function getCheckoutCustomerPayload() {
     const customerId = Number(checkoutSession?.userId);
     const normalizedCustomerId = Number.isFinite(customerId) && customerId > 0 ? customerId : null;
@@ -68,6 +74,7 @@ function getCheckoutCustomerPayload() {
     };
 }
 
+// Bersihin data barang biar format id, nama, harganya bener semua
 function normalizeItems(items) {
     return (Array.isArray(items) ? items : []).map((item) => ({
         productId: Number(item.productId) || 0,
@@ -78,6 +85,7 @@ function normalizeItems(items) {
     })).filter((item) => item.productId > 0 && item.quantity > 0);
 }
 
+// Tampilan kosong melompong kalau keranjangnya nggak ada isinya
 function setEmptyState() {
     if (checkoutItemsEl) {
         checkoutItemsEl.innerHTML = `
@@ -104,6 +112,7 @@ function setEmptyState() {
     }
 }
 
+// Nggambar semua daftar barang keranjang ke layar, ngitung total bayar juga
 function renderCheckout() {
     const totalItems = checkoutItems.reduce((total, item) => total + item.quantity, 0);
     const totalPrice = checkoutItems.reduce((total, item) => total + item.totalPrice, 0);
@@ -176,6 +185,7 @@ function renderCheckout() {
     });
 }
 
+// Minta data detail keranjang dari server pas baru pertama kali buka halaman
 async function loadCheckoutData() {
     checkoutSession = requireSession();
     if (!checkoutSession) {
@@ -219,11 +229,13 @@ async function loadCheckoutData() {
     }
 }
 
+// Nyari tau user lagi milih metode bayar apa (Transfer atau EWallet)
 function getSelectedPaymentMethod() {
     const checked = document.querySelector('input[name="paymentMethod"]:checked');
     return checked ? checked.value : 'EWALLET';
 }
 
+// Gas bayar! Tombol checkout ditekan, ngirim data pesanan akhir ke server
 async function handleCheckoutSubmit(event) {
     event.preventDefault();
 

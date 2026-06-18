@@ -10,10 +10,12 @@ const AUTH_STORAGE_KEYS = [
     'userAvatar'
 ];
 
+// Ngecek mau nyimpen data sesi di localStorage (permanen) atau sessionStorage (ilang kalau tab ditutup)
 function getActiveStorage(persistent) {
     return persistent ? window.localStorage : window.sessionStorage;
 }
 
+// Ngambil data dari storage (mencari di session dulu, kalau nggak ada baru cari di local)
 function getStoredValue(key) {
     try {
         return window.sessionStorage.getItem(key) ?? window.localStorage.getItem(key);
@@ -22,6 +24,7 @@ function getStoredValue(key) {
     }
 }
 
+// Ngecek apakah suatu nilai itu beneran ada isinya (bukan null, false, atau kosong melompong)
 function isTruthyStoredValue(value) {
     if (value === null || value === undefined) {
         return false;
@@ -31,15 +34,18 @@ function isTruthyStoredValue(value) {
     return normalized !== '' && normalized !== 'false' && normalized !== '0' && normalized !== 'null';
 }
 
+// Bikin URL gambar avatar otomatis berdasarkan nama user pakai API ui-avatars
 function buildAvatarUrl(name) {
     const safeName = String(name || 'User').trim() || 'User';
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&background=4338ca&color=ffffff&size=128&bold=true`;
 }
 
+// Bikin teks role/jabatan jadi huruf besar semua dan hapus spasi berlebih
 function normalizeRole(role) {
     return String(role || '').trim().toUpperCase();
 }
 
+// Nyimpen data login user ke dalam browser storage biar pas di-refresh nggak perlu login lagi
 function saveAuthSession(userData, options = {}) {
     const persistent = Boolean(options.persistent);
     const storage = getActiveStorage(persistent);
@@ -74,6 +80,7 @@ function saveAuthSession(userData, options = {}) {
     });
 }
 
+// Ngunjungi storage buat ngambil semua data user yang lagi aktif login saat ini
 function getAuthSession() {
     const isLoggedIn = isTruthyStoredValue(getStoredValue('isLoggedIn'))
         || isTruthyStoredValue(getStoredValue('loggedIn'));
@@ -97,10 +104,12 @@ function getAuthSession() {
     };
 }
 
+// Fungsi simpel buat nanya "Eh, ada yang lagi login nggak nih?" (Ngeluarin True/False)
 function isUserLoggedIn() {
     return getAuthSession() !== null;
 }
 
+// Nentuin user harus dilempar ke halaman mana abis login (Admin ke dashboard, user biasa ke mainpage)
 function getRedirectUrl(role, fallbackRedirect) {
     const normalizedRole = normalizeRole(role);
 
@@ -115,6 +124,7 @@ function getRedirectUrl(role, fallbackRedirect) {
     return 'Mainpage.html';
 }
 
+// Bersih-bersih! Ngilangin semua jejak login dari memori browser
 function clearAuthSession() {
     AUTH_STORAGE_KEYS.forEach((key) => {
         try {
@@ -126,11 +136,13 @@ function clearAuthSession() {
     });
 }
 
+// Tombol keluar: Bersihin data, terus lempar balik ke halaman Login
 function logout(redirectUrl) {
     clearAuthSession();
     window.location.href = redirectUrl || 'Login.html';
 }
 
+// Ngatur tampilan pojok kanan atas di Mainpage (Nampilin foto profil kalau login, nampilin tombol login kalau belum)
 function renderMainpageUserNav() {
     const loginLink = document.getElementById('loginNavLink');
     const userMenu = document.getElementById('userMenu');
@@ -197,6 +209,15 @@ function renderMainpageUserNav() {
         }
     }
 
+    const adminDashboardLink = document.getElementById('adminDashboardLink');
+    if (adminDashboardLink) {
+        if (session.role === 'ADMIN') {
+            adminDashboardLink.classList.remove('hidden');
+        } else {
+            adminDashboardLink.classList.add('hidden');
+        }
+    }
+
     if (userMenuButton && userDropdown) {
         userMenuButton.onclick = () => {
             userDropdown.classList.toggle('hidden');
@@ -210,6 +231,7 @@ function renderMainpageUserNav() {
     }
 }
 
+// Biar non admin gak bisa ngakses dashboard
 function guardAdminAccess() {
     const session = getAuthSession();
 
@@ -226,6 +248,7 @@ function guardAdminAccess() {
     return true;
 }
 
+// Ngatur foto profil dan nama di header halaman Dashboard Admin
 function renderAdminHeader() {
     const session = getAuthSession();
     const avatar = document.getElementById('adminAvatar');

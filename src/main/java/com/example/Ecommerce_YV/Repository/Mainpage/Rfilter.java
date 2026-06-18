@@ -114,4 +114,26 @@ public interface Rfilter extends JpaRepository<Product, Integer> {
             ORDER BY RAND()
             """)
     List<Dsearch.ProductResponse> findAllBySearchOrderByRandom(@Param("search") String search);
+
+    @Query("""
+        SELECT new com.example.Ecommerce_YV.Dto.Mainpage.Dsearch$ProductResponse(
+            p.idProduct,
+            p.namaProduct,
+            p.harga,
+            p.kategori,
+            p.stok,
+            p.imageUrl,
+            p.tLike
+        )
+        FROM Product p
+        WHERE p.stok <= 20
+        AND (
+            :search IS NULL
+            OR :search = ''
+            OR LOWER(p.namaProduct) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.kategori) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+        ORDER BY p.tLike DESC
+            """)
+    List<Dsearch.ProductResponse> findAllBySearchOrderByRecommendation(@Param("search") String search);
 }

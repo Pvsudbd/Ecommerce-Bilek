@@ -33,7 +33,7 @@ public class SLogin {
 
         User user = userOptional.get();
 
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!com.example.Ecommerce_YV.Security.BcryptUtil.checkPassword(request.getPassword(), user.getPassword())) {
             response.setSuccess(false);
             response.setMessage("Password salah");
             return response;

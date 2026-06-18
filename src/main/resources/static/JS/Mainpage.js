@@ -28,6 +28,7 @@ const formatUsd = (angka) =>
         maximumFractionDigits: 0
     }).format(Number(angka) || 0);
 
+// Bersihin teks dari kode bahaya biar web nggak diretas (XSS)
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -37,10 +38,12 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+// Kecilin semua huruf dan hilangin spasi berlebih
 function normalizeText(value) {
     return String(value ?? '').trim().toLowerCase();
 }
 
+// Bikin nama kategori jadi standar biar gampang dicocokin
 function canonicalizeCategory(value) {
     const key = normalizeText(value)
         .replace(/[^a-z0-9]+/g, ' ')
@@ -50,6 +53,7 @@ function canonicalizeCategory(value) {
     return key === 'recommendation' ? 'recomendation' : key;
 }
 
+// Ngerapihin data produk yang mentah dari server jadi format yang rapi
 function normalizeProduct(product) {
     if (!product) {
         return null;
@@ -84,6 +88,7 @@ const SPORTS_CATEGORY_KEYS = new Set([
     'sports'
 ]);
 
+// Nendang user ke halaman Login kalau dia mau akses fitur yang di-gembok
 function redirectToLogin() {
     const params = new URLSearchParams();
     params.set('notice', 'auth-required');
@@ -92,12 +97,14 @@ function redirectToLogin() {
     window.location.href = `Login.html?${params.toString()}`;
 }
 
+// Nyari satu barang secara detail cuma dari nyodorin ID-nya doang
 function getProductById(id) {
     return productCache.get(String(id))
         || products.find((product) => String(product.id) === String(id))
         || null;
 }
 
+// Ngambil dua huruf depan dari nama buat jadi foto profil default
 function getInitials(name) {
     const words = String(name ?? '')
         .trim()
@@ -115,6 +122,7 @@ function getInitials(name) {
     return `${words[0][0]}${words[1][0]}`.toUpperCase();
 }
 
+// Ngubah angka puluhan ribu jadi ada huruf 'K'-nya, misal 15000 -> 15K
 function formatLikeCount(value) {
     const likes = Number(value) || 0;
 
@@ -129,6 +137,7 @@ function formatLikeCount(value) {
     return likes.toLocaleString('en-US');
 }
 
+// Buat ngubah teks label harga pas kamu geser-geser slider range harganya
 function updatePriceLabel() {
     if (!priceLabel || !priceRange) {
         return;
@@ -138,6 +147,7 @@ function updatePriceLabel() {
     priceLabel.textContent = `$${value.toLocaleString('en-US')}`;
 }
 
+// Nentuin settingan urut barang biar gak ngaco
 function normalizeSortValue(sort) {
     const value = String(sort ?? 'default').trim().toLowerCase();
 
@@ -148,19 +158,23 @@ function normalizeSortValue(sort) {
     return 'default';
 }
 
+// Ngintip user lagi ngetik mau nyari barang apa di kotak pencarian
 function getCurrentSearchKeyword() {
     return searchInput ? searchInput.value.trim() : '';
 }
 
+// Ngecek filter 'Urutkan' lagi ada di opsi apa (murah, mahal, dll)
 function getCurrentSortValue() {
     return sortSelect ? sortSelect.value : 'default';
 }
 
+// Tanya "Hei, siapa sih nama yang lagi login sekarang?"
 function getLoggedInCustomerName() {
     const session = getAuthSession();
     return session ? session.name : '';
 }
 
+// Ambil ID rahasia (Primary Key) dari orang yang lagi login
 function getLoggedInCustomerId() {
     const session = getAuthSession();
     if (!session || !session.userId) {
@@ -171,6 +185,7 @@ function getLoggedInCustomerId() {
     return Number.isFinite(value) && value > 0 ? value : null;
 }
 
+// Masukin paksa barang ke keranjang penyimpanan memori
 function setCartState(items) {
     cart = {};
 
@@ -189,6 +204,7 @@ function setCartState(items) {
     renderProducts();
 }
 
+// Ngambil data keranjang murni dari database (Supabase/MySQL)
 async function loadCartFromServer() {
     const session = getAuthSession();
 
@@ -235,6 +251,7 @@ async function loadCartFromServer() {
     }
 }
 
+// Ngambil daftar riwayat belanjaan user dari server
 async function loadOrdersFromServer() {
     const session = getAuthSession();
 
@@ -276,6 +293,7 @@ async function loadOrdersFromServer() {
     }
 }
 
+// Nyuap data jumlah barang di keranjang ke server biar kesimpen beneran
 async function saveCartQuantityToServer(id, quantity) {
     const session = getAuthSession();
 
@@ -310,6 +328,7 @@ async function saveCartQuantityToServer(id, quantity) {
     return data;
 }
 
+// Minta daftar produk dari backend Java (bisa sekalian nyari dan ngurutin)
 async function fetchProductsFromJava(keyword = '', sort = 'default') {
     currentPage = 1;
 
@@ -355,6 +374,7 @@ async function fetchProductsFromJava(keyword = '', sort = 'default') {
     }
 }
 
+// Ganti kategori produk pas menu di sebelah kiri diklik
 function setCategory(cat) {
     const normalizedCategory = canonicalizeCategory(cat);
 
@@ -364,7 +384,17 @@ function setCategory(cat) {
     }
 
     currentCategory = cat;
-    currentPage = 1;
+    
+    // Fetch from java if recommendation
+    if (normalizedCategory === 'recomendation') {
+        fetchProductsFromJava(getCurrentSearchKeyword(), 'recommendation');
+    } else if (normalizedCategory === 'all') {
+        fetchProductsFromJava(getCurrentSearchKeyword(), getCurrentSortValue());
+    } else {
+        // Local filtering
+        currentPage = 1;
+        renderProducts();
+    }
 
     document.querySelectorAll('.cat-btn').forEach((btn) => {
         btn.classList.remove('bg-brand-blue', 'text-white', 'border-brand-blue');
@@ -376,8 +406,6 @@ function setCategory(cat) {
         activeBtn.classList.remove('bg-white', 'text-black', 'border-gray-300');
         activeBtn.classList.add('bg-brand-blue', 'text-white', 'border-brand-blue');
     }
-
-    renderProducts();
 }
 
 function matchesSportsCategory(product) {
@@ -390,7 +418,7 @@ function matchesSportsCategory(product) {
 function matchesCategory(product) {
     const normalizedCategory = canonicalizeCategory(currentCategory);
 
-    if (normalizedCategory === 'all' || normalizedCategory === 'must have') {
+    if (normalizedCategory === 'all' || normalizedCategory === 'must have' || normalizedCategory === 'recomendation') {
         return true;
     }
 
@@ -408,6 +436,7 @@ function matchesCategory(product) {
     return source === target || source.includes(target) || target.includes(source);
 }
 
+// Ngegambar kotak-kotak produk ke layar biar bisa dilihat
 function renderProducts() {
     const grid = document.getElementById('productGrid');
     const empty = document.getElementById('emptyState');
@@ -422,8 +451,9 @@ function renderProducts() {
     const maxPrice = Number(priceRange?.value || Number.MAX_SAFE_INTEGER);
     const normalizedCategory = canonicalizeCategory(currentCategory);
     const isMustHave = normalizedCategory === 'must have';
+    const isRecommendation = normalizedCategory === 'recomendation';
 
-    if (!isMustHave) {
+    if (!isMustHave && !isRecommendation) {
         filtered = filtered.filter((product) => matchesCategory(product));
     }
 
@@ -489,8 +519,8 @@ function renderProducts() {
 
         grid.innerHTML += `
         <article class="group relative flex flex-col overflow-hidden border border-gray-200 bg-white transition duration-200 hover:-translate-y-1 hover:border-brand-blue hover:shadow-lg">
-            <div class="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-gray-100 via-white to-gray-200">
-                <button onclick="toggleWishlist(${product.id})"
+            <div class="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-gray-100 via-white to-gray-200 cursor-pointer" onclick="openProductModal(${product.id})">
+                <button onclick="event.stopPropagation(); toggleWishlist(${product.id})"
                     class="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm transition ${inWishlist ? 'text-brand-blue' : 'text-gray-400 hover:text-brand-blue'}"
                     aria-label="Wishlist">
                     &hearts;
@@ -504,7 +534,7 @@ function renderProducts() {
             </div>
 
             <div class="flex flex-1 flex-col px-3 py-3">
-                <h3 class="text-sm font-semibold leading-5 text-gray-900">${escapeHtml(product.name)}</h3>
+                <h3 class="text-sm font-semibold leading-5 text-gray-900 cursor-pointer hover:text-brand-blue transition" onclick="openProductModal(${product.id})">${escapeHtml(product.name)}</h3>
 
                 <p class="mt-1 text-sm font-bold text-brand-blue">
                     ${formatUsd(product.price)}
@@ -529,6 +559,180 @@ function renderProducts() {
     renderPagination(totalItems, totalPages);
     updateBadges();
     renderDrawer();
+}
+
+// Buka jendela detail produk pas fotonya di-klik
+async function openProductModal(productId) {
+    try {
+        const response = await fetch(`/api/product/${productId}`);
+        if (!response.ok) throw new Error('Gagal memuat detail produk');
+        
+        const data = await response.json();
+        const p = data.product;
+        const comments = data.comments;
+
+        document.getElementById('pmId').value = p.idProduct;
+        document.getElementById('pmName').textContent = p.namaProduct;
+        document.getElementById('pmCategory').textContent = p.kategori;
+        document.getElementById('pmPrice').textContent = formatUsd(p.harga);
+        document.getElementById('pmStock').textContent = p.stok;
+        document.getElementById('pmLike').textContent = formatLikeCount(p.tLike);
+        
+        const imgEl = document.getElementById('pmImage');
+        if (p.imageUrl) {
+            imgEl.src = p.imageUrl;
+            imgEl.classList.remove('hidden');
+        } else {
+            imgEl.src = 'https://via.placeholder.com/300x300?text=No+Image';
+        }
+
+        renderComments(comments);
+        
+        // Setup star logic
+        setupStarRating();
+        
+        // Pre-fill user name if logged in
+        const session = getAuthSession();
+        if (session && session.name) {
+            document.getElementById('commentName').value = session.name;
+        }
+
+        const modal = document.getElementById('productModal');
+        const backdrop = document.getElementById('productModalBackdrop');
+        const content = document.getElementById('productModalContent');
+        
+        modal.classList.remove('hidden');
+        void modal.offsetWidth; // force reflow
+        
+        backdrop.classList.remove('opacity-0');
+        content.classList.remove('opacity-0', 'scale-95');
+
+    } catch (err) {
+        console.error(err);
+        alert('Gagal memuat detail produk.');
+    }
+}
+
+// Tutup jendela detail produk biar nggak menuh-menuhin layar
+function closeProductModal() {
+    const modal = document.getElementById('productModal');
+    const backdrop = document.getElementById('productModalBackdrop');
+    const content = document.getElementById('productModalContent');
+    
+    backdrop.classList.add('opacity-0');
+    content.classList.add('opacity-0', 'scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+// Nampilin ulasan dan komentar orang-orang di jendela produk
+function renderComments(comments) {
+    const container = document.getElementById('pmComments');
+    if (!comments || comments.length === 0) {
+        container.innerHTML = '<p class="text-sm text-slate-400 text-center py-10">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>';
+        return;
+    }
+
+    container.innerHTML = comments.map(c => {
+        let starsHtml = '';
+        const b = c.bintang || 5;
+        for(let i=1; i<=5; i++) {
+            starsHtml += `<span class="${i <= b ? 'text-yellow-400' : 'text-gray-300'} text-sm">★</span>`;
+        }
+        
+        const date = new Date(c.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year:'numeric'});
+
+        return `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">${escapeHtml(c.name)}</p>
+                        <p class="text-xs text-slate-400">${date}</p>
+                    </div>
+                    <div class="flex gap-0.5">${starsHtml}</div>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed">${escapeHtml(c.isi)}</p>
+            </div>
+        `;
+    }).join('');
+}
+
+function setupStarRating() {
+    const stars = document.querySelectorAll('#starRating .star');
+    const input = document.getElementById('commentStars');
+    
+    // Reset to 5
+    input.value = "5";
+    stars.forEach(s => {
+        s.classList.remove('text-gray-300');
+        s.classList.add('text-yellow-400');
+    });
+
+    stars.forEach(star => {
+        star.onclick = function() {
+            const val = parseInt(this.getAttribute('data-val'));
+            input.value = val;
+            
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-val'));
+                if (sVal <= val) {
+                    s.classList.remove('text-gray-300');
+                    s.classList.add('text-yellow-400');
+                } else {
+                    s.classList.remove('text-yellow-400');
+                    s.classList.add('text-gray-300');
+                }
+            });
+        };
+    });
+}
+
+// Ngirim ulasan baru yang barusan diketik user ke database
+async function submitComment(event) {
+    event.preventDefault();
+    const productId = document.getElementById('pmId').value;
+    const name = document.getElementById('commentName').value;
+    const text = document.getElementById('commentText').value;
+    const stars = document.getElementById('commentStars').value;
+    
+    const session = getAuthSession();
+    const idUser = session ? session.userId : null;
+
+    const payload = {
+        idUser: idUser ? parseInt(idUser) : null,
+        name: name,
+        isi: text,
+        bintang: parseInt(stars)
+    };
+
+    const btn = document.getElementById('btnSubmitComment');
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+        const response = await fetch(`/api/product/${productId}/comment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            document.getElementById('commentText').value = '';
+            // Refresh modal data
+            openProductModal(productId);
+        } else {
+            const err = await response.text();
+            alert('Gagal mengirim ulasan: ' + err);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Terjadi kesalahan jaringan.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Kirim';
+    }
 }
 
 function changePage(page) {
@@ -634,6 +838,7 @@ function showCartNotice(message) {
     window.alert(message);
 }
 
+// Masukin barang idaman ke keranjang belanja
 async function addToCart(id, quantity = 1) {
     const session = getAuthSession();
 
@@ -683,6 +888,7 @@ async function addToCart(id, quantity = 1) {
     }
 }
 
+// Nambah atau ngurangin jumlah barang yang udah ada di keranjang (tombol + atau -)
 async function updateCartQty(id, delta) {
     const key = String(id);
     const currentQuantity = Number(cart[key]) || 0;
@@ -711,6 +917,7 @@ async function updateCartQty(id, delta) {
     }
 }
 
+// Namplok/nyopot logo hati di produk kesukaan (Wishlist)
 function toggleWishlist(id) {
     const key = String(id);
 
@@ -724,6 +931,7 @@ function toggleWishlist(id) {
     renderProducts();
 }
 
+// Ngupdate angka kecil merah (notif) di icon keranjang sama hati atas
 function updateBadges() {
     const cartCount = Object.values(cart).reduce((total, qty) => total + qty, 0);
     const wishlistCount = Object.keys(wishlist).length;
@@ -740,6 +948,7 @@ function updateBadges() {
     }
 }
 
+// Buka/tutup laci samping kanan (Laci keranjang belanja)
 function toggleDrawer(type) {
     activeDrawer = type === 'wishlist' || type === 'orders' ? type : 'cart';
 
@@ -770,6 +979,7 @@ function toggleDrawer(type) {
     });
 }
 
+// Nutup paksa laci kanannya
 function closeDrawer() {
     const overlay = document.getElementById('overlay');
     const drawer = document.getElementById('drawer');

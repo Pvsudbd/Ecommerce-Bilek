@@ -45,7 +45,7 @@ public class SRegister {
 
         Customer customer = new Customer();
         customer.setName(request.getName().trim());
-        customer.setPassword(request.getPassword());
+        customer.setPassword(com.example.Ecommerce_YV.Security.BcryptUtil.hashPassword(request.getPassword()));
         customer.setAddress(request.getAddress().trim());
         customer.setRole(Role.CUSTOMER);
 

@@ -195,11 +195,11 @@
         </div>
         
         <!-- Search Bar -->
-        <div class="relative max-w-md w-full mb-6">
+        <div class="flex gap-3 max-w-lg w-full mb-6">
             <input type="text" id="searchInput" placeholder="Cari nama barang atau kategori..." 
-                   class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                   class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                    onkeydown="if(event.key === 'Enter') fetchDashboard()">
-            <button onclick="fetchDashboard()" class="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-indigo-700 shadow-sm hover:shadow-indigo-200">
+            <button onclick="fetchDashboard()" class="shrink-0 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-indigo-700 shadow-sm hover:shadow-indigo-200">
                 CARI
             </button>
         </div>

@@ -1,5 +1,6 @@
 const REGISTER_ENDPOINT = '/api/register';
 
+// Munculin notifikasi melayang di layar (hijau sukses, merah gagal)
 function showNotice(type, title, message) {
     const notice = document.getElementById('registerNotice');
     const titleEl = document.getElementById('registerNoticeTitle');
@@ -31,6 +32,7 @@ function showNotice(type, title, message) {
     });
 }
 
+// Ngumpetin kotak notifikasi biar hilang dari layar
 function hideNotice() {
     const notice = document.getElementById('registerNotice');
     if (!notice) {
@@ -41,6 +43,7 @@ function hideNotice() {
     window.setTimeout(() => notice.classList.add('hidden'), 220);
 }
 
+// Ngasih pinggiran merah dan tulisan error di kolom yang isinya salah
 function setFieldError(input, message) {
     const errorEl = document.getElementById(`${input.id}Error`);
     if (!errorEl) {
@@ -61,6 +64,7 @@ function setFieldError(input, message) {
     errorEl.classList.add('hidden');
 }
 
+// Bersihin semua pesan error dari layar kalau user mulai ngetik lagi
 function clearFieldErrors() {
     ['nameInput', 'addressInput', 'passwordInput', 'confirmInput'].forEach((id) => {
         const input = document.getElementById(id);
@@ -70,6 +74,7 @@ function clearFieldErrors() {
     });
 }
 
+// Tukang cek-cok sebelum data dikirim: ngecek nama, password beda nggak, udah centang rules belum
 function validateForm({ name, address, password, confirmPassword, termsAccepted }) {
     clearFieldErrors();
 
@@ -110,6 +115,7 @@ function validateForm({ name, address, password, confirmPassword, termsAccepted 
 }
 
 
+// Proses utama pas tombol 'Daftar' ditekan. Kirim data ke server buat bikin akun
 async function handleRegisterSubmit(event) {
     event.preventDefault();
 
@@ -183,6 +189,7 @@ async function handleRegisterSubmit(event) {
     }
 }
 
+// Biar bisa ngintip huruf password-nya pas dipencet logo mata
 function togglePasswordVisibility(inputId, eyeOffId, eyeOnId) {
     const input = document.getElementById(inputId);
     const eyeOff = document.getElementById(eyeOffId);
@@ -198,6 +205,7 @@ function togglePasswordVisibility(inputId, eyeOffId, eyeOnId) {
     eyeOn.classList.toggle('hidden', isHidden);
 }
 
+// Ngetes kekuatan password, makin panjang makin greget!
 function checkStrength(value) {
     const bars = [
         document.getElementById('bar1'),
