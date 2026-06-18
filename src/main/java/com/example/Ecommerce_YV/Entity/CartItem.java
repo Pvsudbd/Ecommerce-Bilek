@@ -3,7 +3,7 @@ package com.example.Ecommerce_YV.Entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "cart_item")
+@Table(name = "cart_items")
 public class CartItem {
 
     @Id
