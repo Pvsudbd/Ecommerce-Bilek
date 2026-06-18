@@ -80,6 +80,10 @@
                 <span id="cartCount" class="absolute -top-1.5 -right-2 bg-brand-blue text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
             </button>
 
+            <button onclick="toggleDrawer('orders')" class="hidden sm:inline-flex items-center rounded-full border border-gray-200 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gray-800 transition hover:border-brand-blue hover:text-brand-blue">
+                Orderan
+            </button>
+
             <a id="loginNavLink" href="Login.html" class="inline-flex items-center rounded-full bg-brand-blue px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-brand-blue-hover shadow-sm">
                 Login
             </a>
@@ -194,7 +198,7 @@
             <span>Total:</span>
             <span id="cartTotal" class="text-brand-blue">$0</span>
         </div>
-        <button class="w-full bg-brand-blue hover:bg-brand-blue-hover text-white font-bold uppercase py-3 transition">
+        <button type="button" onclick="window.location.href='Checkout.html'" class="w-full bg-brand-blue hover:bg-brand-blue-hover text-white font-bold uppercase py-3 transition">
             Checkout Sekarang
         </button>
     </div>

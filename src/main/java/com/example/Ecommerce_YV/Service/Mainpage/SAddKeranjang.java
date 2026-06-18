@@ -313,6 +313,7 @@ public class SAddKeranjang {
         response.setProductId(product == null ? null : product.getIdProduct());
         response.setProductName(product == null ? null : product.getNamaProduct());
         response.setQuantity(item.getJumlahBarang() == null ? 0 : item.getJumlahBarang());
+        response.setUnitPrice(product == null || product.getHarga() == null ? 0.0 : product.getHarga().doubleValue());
         response.setTotalPrice(item.getTotalHarga() == null ? 0.0 : item.getTotalHarga());
         response.setAvailableStock(product == null || product.getStok() == null ? 0 : product.getStok());
         return response;

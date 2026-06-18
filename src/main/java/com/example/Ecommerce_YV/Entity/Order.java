@@ -16,7 +16,7 @@ public class Order {
     @JoinColumn(name = "id_user")
     private User user;
 
-    @Column(name = "tanggal")
+    @Column(name = "date")
     private Date tanggal;
 
     @Column(name = "total_harga")

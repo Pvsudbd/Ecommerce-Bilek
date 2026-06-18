@@ -1,6 +1,7 @@
 const Endpoint_Java = '/products/filter';
 const Cart_Endpoint = '/api/cart/add';
 const Cart_State_Endpoint = '/api/cart';
+const Orders_Endpoint = '/api/orders';
 const page_size = 15;
 
 let products = [];
@@ -8,6 +9,7 @@ let currentCategory = 'all';
 let currentPage = 1;
 let cart = {};
 let cartItems = [];
+let orders = [];
 let wishlist = {};
 let activeDrawer = 'cart';
 let loadError = false;
@@ -230,6 +232,47 @@ async function loadCartFromServer() {
     } catch (error) {
         console.warn('Gagal memuat keranjang dari server:', error);
         setCartState([]);
+    }
+}
+
+async function loadOrdersFromServer() {
+    const session = getAuthSession();
+
+    if (!session) {
+        orders = [];
+        return;
+    }
+
+    const customerId = getLoggedInCustomerId();
+    const params = new URLSearchParams();
+
+    if (customerId) {
+        params.set('customerId', String(customerId));
+    } else if (session.name) {
+        params.set('customerName', session.name);
+    }
+
+    if (!params.toString()) {
+        orders = [];
+        return;
+    }
+
+    try {
+        const response = await fetch(`${Orders_Endpoint}?${params.toString()}`, {
+            headers: {
+                Accept: 'application/json'
+            }
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json')
+            ? await response.json()
+            : [];
+
+        orders = response.ok && Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.warn('Gagal memuat order:', error);
+        orders = [];
     }
 }
 
@@ -698,7 +741,7 @@ function updateBadges() {
 }
 
 function toggleDrawer(type) {
-    activeDrawer = type === 'wishlist' ? 'wishlist' : 'cart';
+    activeDrawer = type === 'wishlist' || type === 'orders' ? type : 'cart';
 
     const overlay = document.getElementById('overlay');
     const drawer = document.getElementById('drawer');
@@ -708,8 +751,17 @@ function toggleDrawer(type) {
         return;
     }
 
-    drawerTitle.textContent = activeDrawer === 'wishlist' ? 'Wishlist' : 'Keranjang';
-    renderDrawer();
+    drawerTitle.textContent = activeDrawer === 'wishlist'
+        ? 'Wishlist'
+        : activeDrawer === 'orders'
+            ? 'Order Saya'
+            : 'Keranjang';
+
+    if (activeDrawer === 'orders') {
+        loadOrdersFromServer().then(renderDrawer);
+    } else {
+        renderDrawer();
+    }
 
     overlay.classList.remove('hidden');
     requestAnimationFrame(() => {
@@ -744,6 +796,11 @@ function renderDrawer() {
     }
 
     const isWishlist = activeDrawer === 'wishlist';
+
+    if (activeDrawer === 'orders') {
+        renderOrdersDrawer(drawerItems, drawerFooter, cartTotal);
+        return;
+    }
 
     const items = isWishlist
         ? Object.keys(wishlist)
@@ -838,6 +895,56 @@ function renderDrawer() {
     const total = items.reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
     drawerFooter.classList.remove('hidden');
     cartTotal.textContent = formatUsd(total);
+}
+
+function renderOrdersDrawer(drawerItems, drawerFooter, cartTotal) {
+    drawerFooter.classList.add('hidden');
+    cartTotal.textContent = formatUsd(0);
+
+    if (!orders.length) {
+        drawerItems.innerHTML = `
+            <div class="rounded-2xl border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-500">
+                Belum ada order untuk akun ini.
+            </div>
+        `;
+        return;
+    }
+
+    drawerItems.innerHTML = orders.map((order) => {
+        const items = Array.isArray(order.items) ? order.items : [];
+        const itemRows = items.length
+            ? items.map((item) => `
+                <div class="flex items-start justify-between gap-3 border-t border-gray-100 pt-2 text-xs">
+                    <div class="min-w-0">
+                        <p class="truncate font-semibold text-gray-900">${escapeHtml(item.productName || 'Produk')}</p>
+                        <p class="mt-0.5 text-gray-500">${Number(item.quantity) || 0} barang</p>
+                    </div>
+                    <p class="shrink-0 font-bold text-brand-blue">${formatUsd(item.totalPrice)}</p>
+                </div>
+            `).join('')
+            : `<p class="border-t border-gray-100 pt-2 text-xs text-gray-500">Detail item tidak tersedia.</p>`;
+
+        return `
+            <article class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-brand-blue">Order #${escapeHtml(order.orderId || '-')}</p>
+                        <p class="mt-1 text-xs text-gray-500">${escapeHtml(order.orderDate || '-')}</p>
+                    </div>
+                    <span class="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
+                        ${escapeHtml(order.status || 'PAID')}
+                    </span>
+                </div>
+                <div class="mt-3 space-y-2">
+                    ${itemRows}
+                </div>
+                <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+                    <span class="text-xs font-bold uppercase tracking-wide text-gray-500">${Number(order.totalItems) || 0} item</span>
+                    <span class="text-sm font-black text-gray-900">${formatUsd(order.totalPrice)}</span>
+                </div>
+            </article>
+        `;
+    }).join('');
 }
 
 function bindSearch() {
