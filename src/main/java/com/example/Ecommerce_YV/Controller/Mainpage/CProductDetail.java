@@ -30,4 +30,17 @@ public class CProductDetail {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/comment/{idComment}")
+    public ResponseEntity<?> deleteComment(
+            @PathVariable Integer idComment,
+            @RequestParam(required = false) Integer userId,
+            @RequestParam(required = false) String role) {
+        try {
+            sProductDetail.deleteComment(idComment, userId, role);
+            return ResponseEntity.ok("Komentar berhasil dihapus");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

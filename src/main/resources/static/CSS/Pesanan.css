@@ -1,0 +1,42 @@
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Sidebar gradient */
+.sidebar {
+    background: linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #3730a3 100%);
+}
+
+/* Nav item active */
+.nav-item-active {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+}
+
+/* Scrollbar tipis */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #c7d2fe;
+    border-radius: 99px;
+}
+
+/* Sidebar scrollbar invisible */
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Table Hover */
+tbody tr:hover {
+    background-color: #f8fafc; /* slate-50 */
+}
+
+/* Modal animation */
+#orderDetailModal .bg-white {
+    transition: all 0.3s ease-out;
+}

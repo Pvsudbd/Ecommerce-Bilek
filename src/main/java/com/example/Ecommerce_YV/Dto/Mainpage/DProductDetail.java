@@ -29,5 +29,6 @@ public class DProductDetail {
         private String name;
         private String isi;
         private Integer bintang;
+        private Integer replyTo;
     }
 }

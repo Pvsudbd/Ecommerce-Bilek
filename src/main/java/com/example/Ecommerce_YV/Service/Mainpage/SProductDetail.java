@@ -29,17 +29,37 @@ public class SProductDetail {
     }
 
     public Komentar addComment(Integer productId, DProductDetail.CommentRequest request) throws Exception {
-        // Validate product exists
+        
         productRepository.findById(productId)
                 .orElseThrow(() -> new Exception("Product not found"));
 
+        if (request.getIdUser() == null) {
+            throw new Exception("Wajib login untuk mengirim komentar!");
+        }
+
         Komentar komentar = new Komentar();
         komentar.setIdProduct(productId);
-        komentar.setIdUser(request.getIdUser()); // Bisa null jika guest
+        komentar.setIdUser(request.getIdUser());
+        komentar.setReplyTo(request.getReplyTo());
         komentar.setName(request.getName() != null && !request.getName().isEmpty() ? request.getName() : "Anonymous");
         komentar.setIsi(request.getIsi());
         komentar.setBintang(request.getBintang() != null ? request.getBintang() : 5);
         
         return komentarRepository.save(komentar);
+    }
+
+    public void deleteComment(Integer idComment, Integer idUser, String role) throws Exception {
+        Komentar komentar = komentarRepository.findById(idComment)
+                .orElseThrow(() -> new Exception("Komentar tidak ditemukan"));
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            // Admin bisa hapus komentar siapa saja
+            komentarRepository.deleteById(idComment);
+        } else if (idUser != null && idUser.equals(komentar.getIdUser())) {
+            // User biasa cuma bisa hapus komentarnya sendiri
+            komentarRepository.deleteById(idComment);
+        } else {
+            throw new Exception("Anda tidak memiliki izin untuk menghapus komentar ini!");
+        }
     }
 }

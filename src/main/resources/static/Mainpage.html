@@ -262,8 +262,7 @@
             <div class="p-6 border-t border-slate-100 bg-white">
                 <form id="commentForm" onsubmit="submitComment(event)" class="space-y-4">
                     <input type="hidden" id="pmId" />
-                    <div class="flex items-center justify-between">
-                        <input type="text" id="commentName" placeholder="Nama Anda (opsional)" class="text-sm px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none w-1/2" />
+                    <div class="flex items-center justify-end mb-2">
                         <div class="flex items-center gap-1" id="starRating">
                             <span class="star cursor-pointer text-gray-300 text-2xl hover:text-yellow-400" data-val="1">★</span>
                             <span class="star cursor-pointer text-gray-300 text-2xl hover:text-yellow-400" data-val="2">★</span>
@@ -273,6 +272,12 @@
                             <input type="hidden" id="commentStars" value="5" />
                         </div>
                     </div>
+                    
+                    <div id="replyIndicator" class="hidden text-xs text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg mb-2 flex items-center justify-between border border-indigo-100">
+                        <span>Membalas ke <span id="replyTargetName" class="font-bold"></span></span>
+                        <button type="button" onclick="cancelReply()" class="text-red-500 hover:text-red-700 font-bold ml-2">✖ Batal</button>
+                    </div>
+                    
                     <div class="flex gap-3">
                         <input type="text" id="commentText" required placeholder="Tuliskan pendapatmu tentang produk ini..." class="flex-1 text-sm px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                         <button type="submit" id="btnSubmitComment" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition shadow-md shadow-indigo-200 whitespace-nowrap">
@@ -281,6 +286,29 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-5 right-5 transform transition-all duration-300 translate-x-[150%] opacity-0 bg-indigo-600 text-white px-6 py-3 rounded-xl shadow-2xl z-[100] flex items-center gap-3">
+    <svg id="toastIconSuccess" class="w-6 h-6 hidden text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    <svg id="toastIconError" class="w-6 h-6 hidden text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <span id="toastMsg" class="font-semibold text-sm">Pesan disini</span>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div id="deleteConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4">
+    <div id="deleteConfirmBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+    <div id="deleteConfirmContent" class="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300 text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Hapus Komentar?</h3>
+        <p class="text-slate-500 text-sm mb-6">Kamu yakin pengen ngehapus ulasan ini? Kalau udah dihapus, nggak bisa balik lagi lho.</p>
+        <div class="flex gap-3 justify-center">
+            <button onclick="closeDeleteConfirmModal()" class="px-6 py-2.5 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Batal</button>
+            <button id="btnConfirmDelete" class="px-6 py-2.5 rounded-xl font-semibold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-200 transition">Ya, Hapus</button>
         </div>
     </div>
 </div>

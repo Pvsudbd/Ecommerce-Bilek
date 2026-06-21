@@ -14,6 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+/**
+ * Service khusus buat ngurusin penambahan produk baru dari Dashboard Admin.
+ * Tugas utamanya: Nerima gambar, dikirim ke Supabase Storage, 
+ * dapet link-nya, lalu disimpen ke database MySQL.
+ */
+
 @Service
 public class SDsupaimg {
 
@@ -26,6 +32,7 @@ public class SDsupaimg {
     @Autowired
     private RDashboard rDashboard;
 
+    // Fungsi utama buat nge-gas masukin produk ke database sekalian numpang upload gambar
     public void tambahProduk(String nama, Integer stok, Integer harga, String kategori, MultipartFile file) throws Exception {
         String imageUrl = null;
         if (file != null && !file.isEmpty()) {
@@ -49,6 +56,7 @@ public class SDsupaimg {
         rDashboard.save(product);
     }
 
+    // Java bakal ngirim gambar ke supabase dengan ganti jadi link
     private String uploadImage(MultipartFile file) throws Exception {
         String extension = "";
         String originalName = file.getOriginalFilename();

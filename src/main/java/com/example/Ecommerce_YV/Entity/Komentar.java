@@ -21,6 +21,9 @@ public class Komentar {
     @Column(name = "id_user")
     private Integer idUser;
 
+    @Column(name = "Reply_to")
+    private Integer replyTo;
+
     @Column(name = "id_product")
     private Integer idProduct;
 

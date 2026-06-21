@@ -1,25 +1,8 @@
-# Fitur Search Produk
+# Fitur Search Produk (DEPRECATED / USANG)
 
-Endpoint = GET /products?search=
+### Endpoint Baru
+Gunakan endpoint gabungan ini:
+`GET /products/filter?search=[kata_kunci]&sort=default`
 
-Request Body : Json
-
-    {
-        "Nama_produk" : "Kacang ijo"
-    }
-
-Response Body : Failed
-    
-    {
-        "Response": "Nope",
-        "message": "Product not found"
-    }
-Response Body : Succeed
-    
-    {
-        "Nama_produk" : "Kacang ijo",
-        "Foto_produk",
-        "Harga",
-        "Kategori",
-        "Stok"
-    }
+### Dokumentasi Lengkap
+Silakan baca aturan pemakaian lengkapnya di file [Filterproduk.md](Filterproduk.md).

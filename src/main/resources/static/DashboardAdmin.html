@@ -5,108 +5,266 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sellora – Dashboard Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'DM Sans', sans-serif; }
+        * { font-family: 'Inter', sans-serif; }
+
+        /* Sidebar gradient */
+        .sidebar {
+            background: linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #3730a3 100%);
+        }
+
+        /* Nav item active */
+        .nav-item-active {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Stat card shimmer */
+        .stat-card {
+            background: white;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        }
+
+        /* Product card hover */
+        .product-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px rgba(99,102,241,0.12);
+        }
+
+        /* Scrollbar tipis */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 99px; }
+
+        /* Sidebar scrollbar invisible */
+        .sidebar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900">
+<body class="min-h-screen bg-slate-50 text-slate-900 flex">
 
-<header class="border-b border-slate-200 bg-white">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar w-64 min-h-screen flex-shrink-0 flex flex-col fixed top-0 left-0 h-full z-30 overflow-y-auto">
+    <!-- Logo -->
+    <div class="px-6 py-7 flex items-center gap-3">
+        <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+        </div>
+        <span class="text-white font-extrabold text-xl tracking-tight">Sellora</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="px-3 flex-1">
+        <p class="px-3 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Menu</p>
+
+        <a href="#" class="nav-item-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white text-sm font-semibold mb-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Dashboard
+        </a>
+
+        <a href="Mainpage.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 text-sm font-medium mb-1 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            Lihat Toko
+        </a>
+
+        <a href="Pesanan.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 text-sm font-medium mb-1 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Pesanan
+        </a>
+    </nav>
+
+    <!-- User Profile -->
+    <div class="px-4 py-5 border-t border-white/10">
         <div class="flex items-center gap-3">
-            <img id="adminAvatar" src="" alt="Foto profil admin" class="h-11 w-11 rounded-full border border-indigo-100 object-cover" />
+            <img id="adminAvatar" src="" alt="Foto profil admin" class="w-9 h-9 rounded-full object-cover ring-2 ring-white/30" />
+            <div class="min-w-0">
+                <p id="adminName" class="text-white text-sm font-semibold truncate"></p>
+                <p id="adminRole" class="text-indigo-300 text-[11px] font-medium"></p>
+            </div>
+        </div>
+        <button onclick="logout('Login.html')" class="mt-3 w-full flex items-center justify-center gap-2 text-xs font-semibold text-white/70 hover:text-white bg-white/10 hover:bg-white/20 py-2 rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Logout
+        </button>
+    </div>
+</aside>
+
+<!-- ============ MAIN CONTENT ============ -->
+<div class="ml-64 flex-1 min-h-screen flex flex-col">
+
+    <!-- Top Bar -->
+    <header class="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-lg font-bold text-slate-900">Panel Admin</h1>
+            <p class="text-xs text-slate-400" id="currentDateLabel"></p>
+        </div>
+        <button onclick="openAddProductModal()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-200 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            Tambah Produk
+        </button>
+    </header>
+
+    <main class="flex-1 px-8 py-8">
+
+        <!-- Greeting -->
+        <div class="mb-8">
+            <p class="text-2xl font-extrabold text-slate-900">Selamat datang kembali</p>
+            <p class="text-sm text-slate-500 mt-1">Berikut ringkasan toko kamu hari ini.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
+            <div class="stat-card rounded-2xl border border-slate-100 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Produk</p>
+                    <div class="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                </div>
+                <p id="statTotalProduct" class="text-3xl font-extrabold text-slate-900">—</p>
+                <p class="text-xs text-slate-400 mt-1">Semua produk di database</p>
+            </div>
+
+            <div class="stat-card rounded-2xl border border-slate-100 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Stok Habis</p>
+                    <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z"/></svg>
+                    </div>
+                </div>
+                <p id="statOutOfStock" class="text-3xl font-extrabold text-red-500">—</p>
+                <p class="text-xs text-slate-400 mt-1">Produk yang perlu diisi ulang</p>
+            </div>
+
+            <div class="stat-card rounded-2xl border border-slate-100 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kategori Aktif</p>
+                    <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+                    </div>
+                </div>
+                <p id="statCategories" class="text-3xl font-extrabold text-slate-900">—</p>
+                <p class="text-xs text-slate-400 mt-1">Jenis kategori unik</p>
+            </div>
+        </div>
+
+        <!-- Search & Product Section -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 class="text-base font-bold text-slate-900">Daftar Barang</h2>
+                <!-- Search Bar -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:w-72">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input type="text" id="searchInput" placeholder="Cari produk atau kategori..."
+                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition"
+                               onkeydown="if(event.key === 'Enter') fetchDashboard()">
+                    </div>
+                    <button onclick="fetchDashboard()" class="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">
+                        Cari
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div id="searchResultSection" class="hidden mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-1 h-5 bg-indigo-500 rounded-full"></span>
+                    <h3 class="text-sm font-bold text-slate-700">Hasil Pencarian</h3>
+                </div>
+                <div id="searchResultGrid" class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+            </div>
+
+            <!-- Random Products -->
             <div>
-                <p id="adminName" class="text-sm font-bold text-slate-900"></p>
-                <p id="adminRole" class="text-[11px] font-semibold uppercase tracking-wide text-indigo-600"></p>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-1 h-5 bg-slate-300 rounded-full"></span>
+                    <h3 class="text-sm font-bold text-slate-700">Produk (Acak)</h3>
+                </div>
+                <div id="randomProductsGrid" class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    <!-- Loading skeleton -->
+                    <div class="animate-pulse bg-slate-100 rounded-2xl h-72"></div>
+                    <div class="animate-pulse bg-slate-100 rounded-2xl h-72"></div>
+                    <div class="animate-pulse bg-slate-100 rounded-2xl h-72"></div>
+                    <div class="animate-pulse bg-slate-100 rounded-2xl h-72"></div>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
-            <a href="Mainpage.html" class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition hover:border-indigo-300 hover:text-indigo-700">
-                Lihat Toko
-            </a>
-            <button type="button" onclick="logout('Login.html')" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-indigo-700">
-                Logout
-            </button>
-        </div>
-    </div>
-</header>
-
-<!-- Toast Notification -->
-<div id="toast" class="fixed top-5 right-5 transform transition-all duration-300 translate-x-[150%] opacity-0 bg-indigo-600 text-white px-6 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3">
-    <svg id="toastIconSuccess" class="w-6 h-6 hidden text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-    <svg id="toastIconError" class="w-6 h-6 hidden text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-    <span id="toastMsg" class="font-semibold text-sm">Pesan disini</span>
+    </main>
 </div>
 
-<!-- Modal Tambah Stok -->
+<!-- ============ TOAST ============ -->
+<div id="toast" class="fixed top-5 right-5 transform transition-all duration-300 translate-x-[150%] opacity-0 bg-indigo-600 text-white px-5 py-3 rounded-xl shadow-2xl z-[100] flex items-center gap-3 min-w-[220px]">
+    <svg id="toastIconSuccess" class="w-5 h-5 shrink-0 hidden text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    <svg id="toastIconError" class="w-5 h-5 shrink-0 hidden text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    <span id="toastMsg" class="text-sm font-semibold"></span>
+</div>
+
+<!-- ============ MODAL TAMBAH STOK ============ -->
 <div id="stockModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
-    <div id="stockModalBackdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeStockModal()"></div>
+    <div id="stockModalBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeStockModal()"></div>
     <div id="stockModalContent" class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 transform scale-95 opacity-0 transition-all duration-300">
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Update Stok Barang</h3>
-        <p class="text-sm text-slate-500 mb-6">Masukkan jumlah stok tambahan. (Gunakan angka minus untuk mengurangi stok)</p>
-        
-        <input type="number" id="stockInput" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" placeholder="Contoh: 5 atau -2" />
-        
-        <div class="flex items-center gap-3 mt-6">
-            <button type="button" onclick="closeStockModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition">Batal</button>
-            <button type="button" onclick="submitStock()" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-md shadow-indigo-200 transition">Simpan</button>
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Update Stok</h3>
+                <p class="text-xs text-slate-400">Angka minus untuk mengurangi stok</p>
+            </div>
+        </div>
+        <input type="number" id="stockInput" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all" placeholder="0" />
+        <div class="flex items-center gap-3 mt-5">
+            <button type="button" onclick="closeStockModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition text-sm">Batal</button>
+            <button type="button" onclick="submitStock()" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 shadow-md shadow-indigo-200 transition text-sm">Simpan</button>
         </div>
     </div>
 </div>
 
-<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <div class="rounded-2xl border border-dashed border-indigo-200 bg-white p-8 shadow-sm">
-        <p class="text-xs font-bold uppercase tracking-[0.28em] text-indigo-500">Dashboard Admin</p>
-        <h1 class="mt-2 text-3xl font-bold text-slate-900">Selamat datang, Admin</h1>
-        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-            Halaman ini sudah siap dipakai. Kamu bisa lanjut coding fitur manajemen produk, pesanan, dan laporan di sini.
-        </p>
-
-        <div class="mt-8 grid gap-4 md:grid-cols-3">
-            <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Status</p>
-                <p class="mt-2 text-lg font-bold text-slate-900">Akses Admin Aktif</p>
+<!-- ============ MODAL TAMBAH PRODUK ============ -->
+<div id="addProductModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+    <div id="addProductModalBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeAddProductModal()"></div>
+    <div id="addProductModalContent" class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform scale-95 opacity-0 transition-all duration-300 overflow-y-auto max-h-[90vh]">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
-            <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Role</p>
-                <p class="mt-2 text-lg font-bold text-indigo-600">ADMIN</p>
-            </div>
-            <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Halaman Customer</p>
-                <a href="Mainpage.html" class="mt-2 inline-block text-lg font-bold text-indigo-600 hover:text-indigo-800">Mainpage.html</a>
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Tambah Produk Baru</h3>
+                <p class="text-xs text-slate-400">Isi detail dan upload foto produk</p>
             </div>
         </div>
-    </div>
 
-<!-- Modal Tambah Produk -->
-<div id="addProductModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
-    <div id="addProductModalBackdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeAddProductModal()"></div>
-    <div id="addProductModalContent" class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform scale-95 opacity-0 transition-all duration-300 overflow-y-auto max-h-[90vh]">
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Tambah Produk Baru</h3>
-        <p class="text-sm text-slate-500 mb-6">Masukkan detail produk dan pilih gambar untuk diunggah ke Supabase.</p>
-        
         <form id="addProductForm" onsubmit="submitNewProduct(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Nama Produk</label>
-                <input type="text" id="addName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Produk</label>
+                <input type="text" id="addName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm transition-all" placeholder="Masukkan nama produk..." />
             </div>
-            
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Harga ($)</label>
-                    <input type="number" id="addPrice" required min="0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">Harga ($)</label>
+                    <input type="number" id="addPrice" required min="0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm transition-all" placeholder="0" />
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Stok Awal</label>
-                    <input type="number" id="addStock" required min="0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">Stok Awal</label>
+                    <input type="number" id="addStock" required min="0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm transition-all" placeholder="0" />
                 </div>
             </div>
-            
+
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Kategori</label>
-                <select id="addCategory" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-700">
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kategori</label>
+                <select id="addCategory" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm transition-all text-slate-700">
                     <option value="" disabled selected>Pilih Kategori</option>
                     <option value="Accessories">Accessories</option>
                     <option value="Audio">Audio</option>
@@ -127,35 +285,14 @@
                     <option value="Fitness">Fitness</option>
                     <option value="Food - Bakery">Food - Bakery</option>
                     <option value="Food - Baking">Food - Baking</option>
-                    <option value="Food - Baking Goods">Food - Baking Goods</option>
                     <option value="Food - Beverages">Food - Beverages</option>
                     <option value="Food - Breakfast">Food - Breakfast</option>
                     <option value="Food - Canned Goods">Food - Canned Goods</option>
-                    <option value="Food - Cheese">Food - Cheese</option>
-                    <option value="Food - Condiments">Food - Condiments</option>
-                    <option value="Food - Cooking Oil">Food - Cooking Oil</option>
                     <option value="Food - Dairy">Food - Dairy</option>
-                    <option value="Food - Dairy Alternatives">Food - Dairy Alternatives</option>
-                    <option value="Food - Deli">Food - Deli</option>
-                    <option value="Food - Dips">Food - Dips</option>
-                    <option value="Food - Dressings">Food - Dressings</option>
-                    <option value="Food - Freezer">Food - Freezer</option>
                     <option value="Food - Fresh Produce">Food - Fresh Produce</option>
                     <option value="Food - Frozen Food">Food - Frozen Food</option>
-                    <option value="Food - Frozen Foods">Food - Frozen Foods</option>
-                    <option value="Food - Frozen Vegetables">Food - Frozen Vegetables</option>
                     <option value="Food - Fruits">Food - Fruits</option>
-                    <option value="Food - Grains">Food - Grains</option>
                     <option value="Food - Meat">Food - Meat</option>
-                    <option value="Food - Nuts">Food - Nuts</option>
-                    <option value="Food - Pasta">Food - Pasta</option>
-                    <option value="Food - Prepared Foods">Food - Prepared Foods</option>
-                    <option value="Food - Prepared Meals">Food - Prepared Meals</option>
-                    <option value="Food - Produce">Food - Produce</option>
-                    <option value="Food - Salads">Food - Salads</option>
-                    <option value="Food - Sauces">Food - Sauces</option>
-                    <option value="Food - Seafood">Food - Seafood</option>
-                    <option value="Food - Seasonings">Food - Seasonings</option>
                     <option value="Food - Snacks">Food - Snacks</option>
                     <option value="Food - Vegetables">Food - Vegetables</option>
                     <option value="Furniture">Furniture</option>
@@ -168,14 +305,16 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Foto Produk</label>
-                <input type="file" id="addImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border border-slate-200 rounded-xl" />
-                <p class="text-[10px] text-slate-400 mt-1">* Kosongkan jika belum ada gambar (akan pakai placeholder).</p>
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Foto Produk</label>
+                <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-indigo-300 transition">
+                    <input type="file" id="addImage" accept="image/*" class="w-full text-sm text-slate-500 cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                    <p class="text-[11px] text-slate-400 mt-2">Max 2MB. Kosongkan jika belum ada gambar.</p>
+                </div>
             </div>
-            
-            <div class="flex items-center gap-3 mt-6 pt-2">
-                <button type="button" onclick="closeAddProductModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition">Batal</button>
-                <button type="submit" id="btnSubmitAddProduct" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-md shadow-indigo-200 transition flex justify-center items-center gap-2">
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="button" onclick="closeAddProductModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition text-sm">Batal</button>
+                <button type="submit" id="btnSubmitAddProduct" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 shadow-md shadow-indigo-200 transition text-sm flex justify-center items-center gap-2">
                     Simpan Produk
                 </button>
             </div>
@@ -183,96 +322,92 @@
     </div>
 </div>
 
-    <!-- FITUR SEARCH & PRODUK -->
-    <div class="mt-10">
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h2 class="text-xl font-bold text-slate-900">Daftar Barang</h2>
-            <button onclick="openAddProductModal()" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-700 shadow-md flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Tambah Produk
-            </button>
+<!-- ============ MODAL KONFIRMASI HAPUS ============ -->
+<div id="deleteProductConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4">
+    <div id="deleteProductConfirmBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+    <div id="deleteProductConfirmContent" class="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300 text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
-        
-        <!-- Search Bar -->
-        <div class="flex gap-3 max-w-lg w-full mb-6">
-            <input type="text" id="searchInput" placeholder="Cari nama barang atau kategori..." 
-                   class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                   onkeydown="if(event.key === 'Enter') fetchDashboard()">
-            <button onclick="fetchDashboard()" class="shrink-0 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-indigo-700 shadow-sm hover:shadow-indigo-200">
-                CARI
-            </button>
-        </div>
-
-        <!-- Search Results (Hidden by default) -->
-        <div id="searchResultSection" class="hidden mb-10">
-            <h2 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2">Hasil Pencarian</h2>
-            <div id="searchResultGrid" class="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                <!-- Data hasil pencarian masuk sini -->
-            </div>
-        </div>
-
-        <!-- Random Products -->
-        <div>
-            <h2 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2">Produk Pilihan (Acak)</h2>
-            <div id="randomProductsGrid" class="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                <!-- Data produk acak masuk sini -->
-            </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Hapus Barang?</h3>
+        <p class="text-slate-500 text-sm mb-6">Apakah anda yakin ingin menghapus barang ini? Data yang dihapus tidak bisa dikembalikan.</p>
+        <div class="flex gap-3 justify-center">
+            <button onclick="closeDeleteProductConfirmModal()" class="px-6 py-2.5 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition text-sm">Batal</button>
+            <button onclick="executeHapusProduk()" class="px-6 py-2.5 rounded-xl font-semibold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-200 transition text-sm">Ya, Hapus</button>
         </div>
     </div>
+</div>
 
-</main>
-<script src="JS/Auth.js"></script>
+<script src="JS/Auth.js?v=20260621-2"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        if (!guardAdminAccess()) {
-            return;
-        }
+        if (!guardAdminAccess()) return;
         renderAdminHeader();
-        fetchDashboard(); // Load data saat halaman pertama dibuka
+        fetchDashboard();
+
+        // Tanggal hari ini di header
+        const now = new Date();
+        const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDateLabel').textContent = now.toLocaleDateString('id-ID', opts);
     });
 
-    // Fungsi untuk hit API /api/dashboard
     async function fetchDashboard() {
         const searchInput = document.getElementById('searchInput').value;
         let url = '/api/dashboard';
-        
+
         if (searchInput && searchInput.trim() !== '') {
             url += `?search=${encodeURIComponent(searchInput.trim())}`;
         }
-        
+
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, { headers: getAuthHeaders() });
             if (!response.ok) throw new Error("Gagal mengambil data");
             const data = await response.json();
-            
-            // Render 6 produk acak
+
+            // Update stat cards
+            const allProducts = [
+                ...(data.randomProducts || []),
+                ...(data.searchResults || [])
+            ];
+
+            if (data.randomProducts) {
+                const outOfStock = data.randomProducts.filter(p => p.stock <= 0).length;
+                const categories = new Set(data.randomProducts.map(p => p.category)).size;
+
+                document.getElementById('statTotalProduct').textContent = data.randomProducts.length;
+                document.getElementById('statOutOfStock').textContent = outOfStock;
+                document.getElementById('statCategories').textContent = categories;
+            }
+
+            // Render produk acak
             const randomGrid = document.getElementById('randomProductsGrid');
             if (data.randomProducts && data.randomProducts.length > 0) {
                 randomGrid.innerHTML = data.randomProducts.map(createProductCard).join('');
             } else {
-                randomGrid.innerHTML = '<p class="col-span-full text-slate-500 italic">Belum ada barang di database.</p>';
+                randomGrid.innerHTML = '<p class="col-span-full text-slate-400 text-sm italic py-4">Belum ada barang di database.</p>';
             }
-            
+
             // Render hasil pencarian
             const searchSection = document.getElementById('searchResultSection');
             const searchGrid = document.getElementById('searchResultGrid');
-            
+
             if (data.searchResults && data.searchResults.length > 0) {
                 searchSection.classList.remove('hidden');
                 searchGrid.innerHTML = data.searchResults.map(createProductCard).join('');
             } else if (searchInput && searchInput.trim() !== '') {
                 searchSection.classList.remove('hidden');
-                searchGrid.innerHTML = '<p class="col-span-full text-slate-500 italic">Barang tidak ditemukan.</p>';
+                searchGrid.innerHTML = '<p class="col-span-full text-slate-400 text-sm italic py-4">Barang tidak ditemukan.</p>';
             } else {
                 searchSection.classList.add('hidden');
                 searchGrid.innerHTML = '';
             }
+
         } catch (error) {
             console.error('Error fetching dashboard:', error);
-            alert("Terjadi kesalahan saat memuat data.");
+            showToast("Terjadi kesalahan saat memuat data.", true);
         }
     }
+
     let currentStockProductId = null;
     let toastTimeout = null;
 
@@ -283,54 +418,88 @@
         const iconError = document.getElementById('toastIconError');
 
         toastMsg.textContent = msg;
-        
+
         if (isError) {
-            toast.classList.replace('bg-indigo-600', 'bg-red-600');
+            toast.classList.replace('bg-indigo-600', 'bg-red-500');
             iconSuccess.classList.add('hidden');
             iconError.classList.remove('hidden');
         } else {
-            toast.classList.replace('bg-red-600', 'bg-indigo-600');
+            toast.classList.replace('bg-red-500', 'bg-indigo-600');
             iconError.classList.add('hidden');
             iconSuccess.classList.remove('hidden');
         }
 
         toast.classList.remove('translate-x-[150%]', 'opacity-0');
-        
+
         if (toastTimeout) clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
             toast.classList.add('translate-x-[150%]', 'opacity-0');
         }, 3000);
     }
 
-    async function hapusProduk(id) {
-        if (!confirm('Apakah anda yakin ingin menghapus barang ini?')) return;
-        
+    let productToDeleteId = null;
+
+    function hapusProduk(id) {
+        productToDeleteId = id;
+        const modal = document.getElementById('deleteProductConfirmModal');
+        const backdrop = document.getElementById('deleteProductConfirmBackdrop');
+        const content = document.getElementById('deleteProductConfirmContent');
+
+        modal.classList.remove('hidden');
+        void modal.offsetWidth;
+        backdrop.classList.remove('opacity-0');
+        content.classList.remove('opacity-0', 'scale-95');
+    }
+
+    function closeDeleteProductConfirmModal() {
+        const modal = document.getElementById('deleteProductConfirmModal');
+        const backdrop = document.getElementById('deleteProductConfirmBackdrop');
+        const content = document.getElementById('deleteProductConfirmContent');
+
+        backdrop.classList.add('opacity-0');
+        content.classList.add('opacity-0', 'scale-95');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            productToDeleteId = null;
+        }, 300);
+    }
+
+    async function executeHapusProduk() {
+        if (!productToDeleteId) return;
+
         try {
-            const response = await fetch(`/api/dashboard/${id}`, { method: 'DELETE' });
+            const response = await fetch(`/api/dashboard/${productToDeleteId}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
             if (response.ok) {
                 showToast('Barang berhasil dihapus!');
-                fetchDashboard(); // Refresh halaman otomatis
+                closeDeleteProductConfirmModal();
+                fetchDashboard();
             } else {
                 const err = await response.text();
                 showToast(`Gagal menghapus: ${err}`, true);
+                closeDeleteProductConfirmModal();
             }
         } catch (error) {
             console.error('Error delete:', error);
             showToast('Terjadi kesalahan jaringan.', true);
+            closeDeleteProductConfirmModal();
         }
     }
 
     function openStockModal(id) {
         currentStockProductId = id;
         document.getElementById('stockInput').value = '';
-        
+
         const modal = document.getElementById('stockModal');
         const backdrop = document.getElementById('stockModalBackdrop');
         const content = document.getElementById('stockModalContent');
-        
+
         modal.classList.remove('hidden');
-        void modal.offsetWidth; // trigger reflow
-        
+        void modal.offsetWidth;
+
         backdrop.classList.remove('opacity-0');
         content.classList.remove('opacity-0', 'scale-95');
         document.getElementById('stockInput').focus();
@@ -340,10 +509,10 @@
         const modal = document.getElementById('stockModal');
         const backdrop = document.getElementById('stockModalBackdrop');
         const content = document.getElementById('stockModalContent');
-        
+
         backdrop.classList.add('opacity-0');
         content.classList.add('opacity-0', 'scale-95');
-        
+
         setTimeout(() => {
             modal.classList.add('hidden');
             currentStockProductId = null;
@@ -352,7 +521,7 @@
 
     async function submitStock() {
         if (!currentStockProductId) return;
-        
+
         const input = document.getElementById('stockInput').value;
         if (!input || input.trim() === '') {
             showToast('Input stok tidak boleh kosong!', true);
@@ -368,30 +537,28 @@
         try {
             const response = await fetch(`/api/dashboard/${currentStockProductId}/stock`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ jumlah: jumlah })
             });
 
             if (response.ok) {
                 showToast('Stok berhasil diupdate!');
-                
-                // Update text di layar tanpa me-refresh halaman agar produk tidak teracak/hilang
+
                 const stockEl = document.getElementById(`stock-display-${currentStockProductId}`);
                 if (stockEl) {
                     let currentStockText = stockEl.innerText;
                     let oldStock = currentStockText === 'Habis' ? 0 : parseInt(currentStockText, 10);
                     let newStock = oldStock + jumlah;
-                    
+
                     stockEl.innerText = newStock > 0 ? newStock : 'Habis';
                     if (newStock > 0) {
                         stockEl.classList.remove('text-red-500');
-                        stockEl.classList.add('text-green-600');
+                        stockEl.classList.add('text-emerald-600');
                     } else {
-                        stockEl.classList.remove('text-green-600');
+                        stockEl.classList.remove('text-emerald-600');
                         stockEl.classList.add('text-red-500');
                     }
                 }
-
                 closeStockModal();
             } else {
                 const err = await response.text();
@@ -407,12 +574,12 @@
         const modal = document.getElementById('addProductModal');
         const backdrop = document.getElementById('addProductModalBackdrop');
         const content = document.getElementById('addProductModalContent');
-        
+
         document.getElementById('addProductForm').reset();
-        
+
         modal.classList.remove('hidden');
-        void modal.offsetWidth; // trigger reflow
-        
+        void modal.offsetWidth;
+
         backdrop.classList.remove('opacity-0');
         content.classList.remove('opacity-0', 'scale-95');
         document.getElementById('addName').focus();
@@ -422,31 +589,29 @@
         const modal = document.getElementById('addProductModal');
         const backdrop = document.getElementById('addProductModalBackdrop');
         const content = document.getElementById('addProductModalContent');
-        
+
         backdrop.classList.add('opacity-0');
         content.classList.add('opacity-0', 'scale-95');
-        
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
+
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
     async function submitNewProduct(event) {
         event.preventDefault();
-        
+
         const nama = document.getElementById('addName').value;
         const harga = document.getElementById('addPrice').value;
         const stok = document.getElementById('addStock').value;
         const kategori = document.getElementById('addCategory').value;
         const fileInput = document.getElementById('addImage');
-        
+
         if (!nama || !harga || !stok || !kategori) {
-            showToast('Harap lengkapi semua field teks!', true);
+            showToast('Harap lengkapi semua field!', true);
             return;
         }
 
         if (fileInput.files.length > 0) {
-            const fileSize = fileInput.files[0].size / 1024 / 1024; // in MB
+            const fileSize = fileInput.files[0].size / 1024 / 1024;
             if (fileSize > 2) {
                 showToast('Ukuran gambar tidak boleh lebih dari 2MB!', true);
                 return;
@@ -458,18 +623,17 @@
         formData.append('harga', harga);
         formData.append('stok', stok);
         formData.append('kategori', kategori);
-        if (fileInput.files.length > 0) {
-            formData.append('file', fileInput.files[0]);
-        }
+        if (fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
 
         const btnSubmit = document.getElementById('btnSubmitAddProduct');
         const originalText = btnSubmit.innerHTML;
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = 'Menyimpan...';
+        btnSubmit.innerHTML = '<span class="animate-pulse">Menyimpan...</span>';
 
         try {
             const response = await fetch('/api/dashboard/product', {
                 method: 'POST',
+                headers: getAuthHeaders(),
                 body: formData
             });
 
@@ -490,41 +654,45 @@
         }
     }
 
-    // Fungsi untuk membuat HTML Card Produk
+    // Bikin kartu produk di grid
     function createProductCard(product) {
-        // Harga diformat ke Dollar
         const priceFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(product.price);
-        // Fallback jika tidak ada gambar
         const imgUrl = product.imageUrl || 'https://via.placeholder.com/300x300?text=No+Image';
+        const inStock = product.stock > 0;
 
         return `
-            <div class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg hover:border-indigo-300 relative">
-                <div class="relative h-48 w-full overflow-hidden bg-slate-100">
-                    <img src="${imgUrl}" alt="${product.name}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                    <div class="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm backdrop-blur">
+            <div class="product-card group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+                <div class="relative h-44 overflow-hidden bg-slate-100">
+                    <img src="${imgUrl}" alt="${product.name}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                    <div class="absolute top-3 left-3">
+                        <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-lg ${inStock ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}">
+                            ${inStock ? '● Tersedia' : '● Habis'}
+                        </span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[11px] font-bold text-slate-600 shadow-sm">
                         ❤️ ${product.likeCount || 0}
                     </div>
                 </div>
-                <div class="flex flex-1 flex-col p-5">
-                    <span class="mb-1 text-[10px] font-bold uppercase tracking-wider text-indigo-500">${product.category}</span>
-                    <h3 class="mb-1 line-clamp-2 text-base font-bold text-slate-900">${product.name}</h3>
-                    <div class="mt-auto pt-3 flex items-end justify-between border-t border-slate-100 mb-3">
+                <div class="flex flex-col flex-1 p-4">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 mb-1">${product.category}</span>
+                    <h3 class="text-sm font-bold text-slate-900 line-clamp-2 mb-3 leading-snug">${product.name}</h3>
+                    <div class="flex items-end justify-between mt-auto pt-3 border-t border-slate-100">
                         <div>
-                            <p class="text-xs font-medium text-slate-500">Harga</p>
-                            <p class="text-sm font-bold text-slate-900">${priceFormatted}</p>
+                            <p class="text-[10px] text-slate-400 font-medium">Harga</p>
+                            <p class="text-sm font-extrabold text-slate-900">${priceFormatted}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs font-medium text-slate-500">Stok</p>
-                            <p id="stock-display-${product.id}" class="text-sm font-bold ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}">${product.stock > 0 ? product.stock : 'Habis'}</p>
+                            <p class="text-[10px] text-slate-400 font-medium">Stok</p>
+                            <p id="stock-display-${product.id}" class="text-sm font-extrabold ${inStock ? 'text-emerald-600' : 'text-red-500'}">${inStock ? product.stock : 'Habis'}</p>
                         </div>
                     </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="grid grid-cols-2 gap-2 mt-2">
-                        <button onclick="openStockModal(${product.id})" class="rounded-lg bg-green-500 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-green-600">
-                            + Stok
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <button onclick="openStockModal(${product.id})" class="flex items-center justify-center gap-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold py-2 hover:bg-emerald-100 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            Stok
                         </button>
-                        <button onclick="hapusProduk(${product.id})" class="rounded-lg bg-red-500 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-red-600">
+                        <button onclick="hapusProduk(${product.id})" class="flex items-center justify-center gap-1 rounded-xl bg-red-50 text-red-600 text-xs font-bold py-2 hover:bg-red-100 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             Hapus
                         </button>
                     </div>
@@ -533,5 +701,6 @@
         `;
     }
 </script>
+
 </body>
 </html>

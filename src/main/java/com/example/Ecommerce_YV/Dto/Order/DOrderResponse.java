@@ -16,6 +16,8 @@ public class DOrderResponse {
 
     private List<DOrderItemResponse> items;
 
+    private String customerName;
+
     public Integer getOrderId() {
         return orderId;
     }
@@ -62,5 +64,13 @@ public class DOrderResponse {
 
     public void setItems(List<DOrderItemResponse> items) {
         this.items = items;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 }

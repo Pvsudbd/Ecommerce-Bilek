@@ -583,128 +583,182 @@ async function openProductModal(productId) {
             imgEl.src = p.imageUrl;
             imgEl.classList.remove('hidden');
         } else {
-            imgEl.src = 'https://via.placeholder.com/300x300?text=No+Image';
-        }
-
-        renderComments(comments);
-        
-        // Setup star logic
-        setupStarRating();
-        
-        // Pre-fill user name if logged in
-        const session = getAuthSession();
-        if (session && session.name) {
-            document.getElementById('commentName').value = session.name;
-        }
-
-        const modal = document.getElementById('productModal');
-        const backdrop = document.getElementById('productModalBackdrop');
-        const content = document.getElementById('productModalContent');
-        
-        modal.classList.remove('hidden');
-        void modal.offsetWidth; // force reflow
-        
-        backdrop.classList.remove('opacity-0');
-        content.classList.remove('opacity-0', 'scale-95');
-
-    } catch (err) {
-        console.error(err);
-        alert('Gagal memuat detail produk.');
+        imgEl.src = 'https://via.placeholder.com/300x300?text=No+Image';
     }
-}
 
-// Tutup jendela detail produk biar nggak menuh-menuhin layar
-function closeProductModal() {
+    renderComments(comments);
+    
+    // Setup star logic
+    setupStarRating();
+    
+    // Reset reply state whenever modal opens
+    cancelReply();
+
     const modal = document.getElementById('productModal');
     const backdrop = document.getElementById('productModalBackdrop');
     const content = document.getElementById('productModalContent');
     
-    backdrop.classList.add('opacity-0');
-    content.classList.add('opacity-0', 'scale-95');
+    modal.classList.remove('hidden');
+    void modal.offsetWidth; // force reflow
     
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300);
+    backdrop.classList.remove('opacity-0');
+    content.classList.remove('opacity-0', 'scale-95');
+
+} catch (err) {
+    console.error(err);
+    showToast('Gagal memuat detail produk.', true);
+}
+}
+
+// Tutup jendela detail produk biar nggak menuh-menuhin layar
+function closeProductModal() {
+const modal = document.getElementById('productModal');
+const backdrop = document.getElementById('productModalBackdrop');
+const content = document.getElementById('productModalContent');
+
+backdrop.classList.add('opacity-0');
+content.classList.add('opacity-0', 'scale-95');
+
+setTimeout(() => {
+    modal.classList.add('hidden');
+}, 300);
 }
 
 // Nampilin ulasan dan komentar orang-orang di jendela produk
 function renderComments(comments) {
-    const container = document.getElementById('pmComments');
-    if (!comments || comments.length === 0) {
-        container.innerHTML = '<p class="text-sm text-slate-400 text-center py-10">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>';
-        return;
+const container = document.getElementById('pmComments');
+if (!comments || comments.length === 0) {
+    container.innerHTML = '<p class="text-sm text-slate-400 text-center py-10">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>';
+    return;
+}
+
+const session = getAuthSession();
+const currentUserId = session ? parseInt(session.userId) : null;
+const currentUserRole = session ? session.role : null;
+
+container.innerHTML = comments.map(c => {
+    let starsHtml = '';
+    const b = c.bintang || 5;
+    for(let i=1; i<=5; i++) {
+        starsHtml += `<span class="${i <= b ? 'text-yellow-400' : 'text-gray-300'} text-sm">★</span>`;
+    }
+    
+    const date = new Date(c.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year:'numeric'});
+    
+    // Cek jika komentar ini merupakan balasan
+    let replyIndicatorHtml = '';
+    if (c.replyTo) {
+        const targetUser = comments.find(x => x.idUser === c.replyTo);
+        const targetName = targetUser ? targetUser.name : 'Seseorang';
+        replyIndicatorHtml = `<span class="text-xs text-indigo-500 font-semibold bg-indigo-50 px-2 py-0.5 rounded-md mb-1 inline-block">Membalas ke @${escapeHtml(targetName)}</span>`;
     }
 
-    container.innerHTML = comments.map(c => {
-        let starsHtml = '';
-        const b = c.bintang || 5;
-        for(let i=1; i<=5; i++) {
-            starsHtml += `<span class="${i <= b ? 'text-yellow-400' : 'text-gray-300'} text-sm">★</span>`;
-        }
-        
-        const date = new Date(c.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year:'numeric'});
-
-        return `
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <p class="font-bold text-slate-800 text-sm">${escapeHtml(c.name)}</p>
-                        <p class="text-xs text-slate-400">${date}</p>
-                    </div>
-                    <div class="flex gap-0.5">${starsHtml}</div>
-                </div>
-                <p class="text-slate-600 text-sm leading-relaxed">${escapeHtml(c.isi)}</p>
-            </div>
+    // Cek apakah user berhak menghapus komentar ini
+    let deleteBtnHtml = '';
+    if (currentUserRole === 'ADMIN' || (currentUserId !== null && currentUserId === c.idUser)) {
+        deleteBtnHtml = `
+            <button onclick="deleteComment(${c.id}, ${c.idProduct})" class="text-red-500 hover:text-red-700 p-1 rounded transition" title="Hapus Komentar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
         `;
-    }).join('');
+    }
+
+    // Tombol Balas (hanya untuk user login)
+    let replyBtnHtml = '';
+    if (currentUserId !== null) {
+        replyBtnHtml = `
+            <button onclick="startReply(${c.idUser}, '${escapeHtml(c.name).replace(/'/g, "\\'")}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium ml-2">Balas</button>
+        `;
+    }
+
+    return `
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 group">
+            ${replyIndicatorHtml}
+            <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center gap-2">
+                    <p class="font-bold text-slate-800 text-sm">${escapeHtml(c.name)}</p>
+                    <p class="text-xs text-slate-400">${date}</p>
+                    ${replyBtnHtml}
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex gap-0.5">${starsHtml}</div>
+                    ${deleteBtnHtml}
+                </div>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">${escapeHtml(c.isi)}</p>
+        </div>
+    `;
+}).join('');
 }
 
 function setupStarRating() {
-    const stars = document.querySelectorAll('#starRating .star');
-    const input = document.getElementById('commentStars');
-    
-    // Reset to 5
-    input.value = "5";
-    stars.forEach(s => {
-        s.classList.remove('text-gray-300');
-        s.classList.add('text-yellow-400');
-    });
+const stars = document.querySelectorAll('#starRating .star');
+const input = document.getElementById('commentStars');
 
-    stars.forEach(star => {
-        star.onclick = function() {
-            const val = parseInt(this.getAttribute('data-val'));
-            input.value = val;
-            
-            stars.forEach(s => {
-                const sVal = parseInt(s.getAttribute('data-val'));
-                if (sVal <= val) {
-                    s.classList.remove('text-gray-300');
-                    s.classList.add('text-yellow-400');
-                } else {
-                    s.classList.remove('text-yellow-400');
-                    s.classList.add('text-gray-300');
-                }
-            });
-        };
-    });
+// Reset to 5
+input.value = "5";
+stars.forEach(s => {
+    s.classList.remove('text-gray-300');
+    s.classList.add('text-yellow-400');
+});
+
+stars.forEach(star => {
+    star.onclick = function() {
+        const val = parseInt(this.getAttribute('data-val'));
+        input.value = val;
+        
+        stars.forEach(s => {
+            const sVal = parseInt(s.getAttribute('data-val'));
+            if (sVal <= val) {
+                s.classList.remove('text-gray-300');
+                s.classList.add('text-yellow-400');
+            } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+            }
+        });
+    };
+});
+}
+
+let currentReplyToId = null;
+
+function startReply(idUser, userName) {
+    currentReplyToId = idUser;
+    document.getElementById('replyTargetName').textContent = userName;
+    document.getElementById('replyIndicator').classList.remove('hidden');
+    document.getElementById('commentText').focus();
+}
+
+function cancelReply() {
+    currentReplyToId = null;
+    document.getElementById('replyTargetName').textContent = '';
+    document.getElementById('replyIndicator').classList.add('hidden');
 }
 
 // Ngirim ulasan baru yang barusan diketik user ke database
 async function submitComment(event) {
     event.preventDefault();
+    
+    const session = getAuthSession();
+    if (!session || !session.userId) {
+        showToast("Waduh, kamu harus Login dulu buat ngasih ulasan!", true);
+        return;
+    }
+
     const productId = document.getElementById('pmId').value;
-    const name = document.getElementById('commentName').value;
     const text = document.getElementById('commentText').value;
     const stars = document.getElementById('commentStars').value;
     
-    const session = getAuthSession();
-    const idUser = session ? session.userId : null;
+    // Nama langsung dikunci dari sesi user yang aktif, gaperlu input lagi
+    const finalName = session.name;
 
     const payload = {
-        idUser: idUser ? parseInt(idUser) : null,
-        name: name,
+        idUser: parseInt(session.userId),
+        name: finalName,
         isi: text,
-        bintang: parseInt(stars)
+        bintang: parseInt(stars),
+        replyTo: currentReplyToId
     };
 
     const btn = document.getElementById('btnSubmitComment');
@@ -720,20 +774,85 @@ async function submitComment(event) {
 
         if (response.ok) {
             document.getElementById('commentText').value = '';
+            showToast('Komentar berhasil ditambahkan!');
             // Refresh modal data
             openProductModal(productId);
         } else {
             const err = await response.text();
-            alert('Gagal mengirim ulasan: ' + err);
+            showToast('Gagal mengirim ulasan: ' + err, true);
         }
     } catch (error) {
         console.error(error);
-        alert('Terjadi kesalahan jaringan.');
+        showToast('Terjadi kesalahan jaringan.', true);
     } finally {
         btn.disabled = false;
         btn.textContent = 'Kirim';
     }
 }
+
+// Logika Modal Hapus Komentar
+let commentToDeleteId = null;
+let productOfCommentToDeleteId = null;
+
+function deleteComment(commentId, productId) {
+    commentToDeleteId = commentId;
+    productOfCommentToDeleteId = productId;
+    
+    const modal = document.getElementById('deleteConfirmModal');
+    const backdrop = document.getElementById('deleteConfirmBackdrop');
+    const content = document.getElementById('deleteConfirmContent');
+    
+    modal.classList.remove('hidden');
+    void modal.offsetWidth; // force reflow
+    backdrop.classList.remove('opacity-0');
+    content.classList.remove('opacity-0', 'scale-95');
+}
+
+function closeDeleteConfirmModal() {
+    const modal = document.getElementById('deleteConfirmModal');
+    const backdrop = document.getElementById('deleteConfirmBackdrop');
+    const content = document.getElementById('deleteConfirmContent');
+    
+    backdrop.classList.add('opacity-0');
+    content.classList.add('opacity-0', 'scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        commentToDeleteId = null;
+        productOfCommentToDeleteId = null;
+    }, 300);
+}
+
+// Menjalankan proses hapus saat tombol "Ya, Hapus" di dalam modal ditekan
+document.getElementById('btnConfirmDelete').addEventListener('click', async function() {
+    if (!commentToDeleteId) return;
+    
+    const session = getAuthSession();
+    if (!session || !session.userId) {
+        showToast("Kamu harus login untuk menghapus komentar!", true);
+        closeDeleteConfirmModal();
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/product/comment/${commentToDeleteId}?userId=${session.userId}&role=${session.role}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            showToast('Komentar berhasil dihapus!');
+            closeDeleteConfirmModal();
+            // Refresh komentar langsung di modal
+            openProductModal(productOfCommentToDeleteId);
+        } else {
+            const err = await response.text();
+            showToast('Gagal menghapus: ' + err, true);
+        }
+    } catch (error) {
+        console.error(error);
+        showToast('Terjadi kesalahan saat menghapus komentar.', true);
+    }
+});
 
 function changePage(page) {
     currentPage = page;
@@ -835,7 +954,7 @@ function showCartNotice(message) {
         return;
     }
 
-    window.alert(message);
+    showToast(message);
 }
 
 // Masukin barang idaman ke keranjang belanja
@@ -1198,3 +1317,34 @@ function initPage() {
 }
 
 initPage();
+
+// Fitur Toast Notification untuk menggantikan alert bawaan browser
+let toastTimeout = null;
+
+function showToast(msg, isError = false) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    
+    const toastMsg = document.getElementById('toastMsg');
+    const iconSuccess = document.getElementById('toastIconSuccess');
+    const iconError = document.getElementById('toastIconError');
+
+    toastMsg.textContent = msg;
+    
+    if (isError) {
+        toast.classList.replace('bg-indigo-600', 'bg-red-600');
+        iconSuccess.classList.add('hidden');
+        iconError.classList.remove('hidden');
+    } else {
+        toast.classList.replace('bg-red-600', 'bg-indigo-600');
+        iconError.classList.add('hidden');
+        iconSuccess.classList.remove('hidden');
+    }
+
+    toast.classList.remove('translate-x-[150%]', 'opacity-0');
+    
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-x-[150%]', 'opacity-0');
+    }, 3000);
+}

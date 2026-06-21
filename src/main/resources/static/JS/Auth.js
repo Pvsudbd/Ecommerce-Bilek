@@ -272,3 +272,14 @@ function renderAdminHeader() {
         role.textContent = 'Administrator';
     }
 }
+
+// Bikin objek headers standar yang selalu disertakan saat nembak API sensitif.
+// Ini yang jadi "kartu identitas" yang dibaca oleh penjaga pintu di Java (AdminInterceptor).
+function getAuthHeaders(extraHeaders = {}) {
+    const session = getAuthSession();
+    return {
+        'X-User-Id': session ? String(session.userId) : '',
+        'X-User-Role': session ? session.role : '',
+        ...extraHeaders
+    };
+}

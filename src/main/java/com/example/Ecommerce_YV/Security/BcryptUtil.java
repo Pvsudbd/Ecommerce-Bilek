@@ -5,7 +5,7 @@ public class BcryptUtil {
 
     /**
      * Mengubah password plaintext menjadi hash BCrypt yang aman (sudah otomatis menggunakan salt).
-     * @param plainPassword Password asli yang diketik user
+     * @paramplainPassword Password asli yang diketik user
      * @return Hash string BCrypt, biar jadi kayak $224#
      */
     public static String hashPassword(String plainPassword) {
